@@ -15,6 +15,7 @@ import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
+import bagBuddyStyles from '~/styles/bagbuddy.css?url';
 import {PageLayout} from './components/PageLayout';
 
 export type RootLoader = typeof loader;
@@ -151,6 +152,22 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
+        <link rel="stylesheet" href={bagBuddyStyles}></link>
+        <link
+          rel="preload"
+          href="/fonts/PaytoneOne-Regular.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/Montserrat-Variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <meta name="theme-color" content="#472F92" />
         <Meta />
         <Links />
       </head>
