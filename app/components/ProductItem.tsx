@@ -3,30 +3,32 @@ import {Image, Money} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
-  RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import {findProductPricing, formatUsd} from '~/config/pricing';
 
+/**
+ * Product card. For Bag Buddy products (matched by handle or tag) the price
+ * comes from app/config/pricing.ts, which takes priority over Shopify.
+ */
 export function ProductItem({
   product,
   loading,
 }: {
-  product:
-    | CollectionItemFragment
-    | ProductItemFragment
-    | RecommendedProductFragment;
+  product: CollectionItemFragment | ProductItemFragment;
   loading?: 'eager' | 'lazy';
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
+  const pricing = findProductPricing(product);
   return (
     <Link
-      className="product-item"
+      className="product-item bb-product-card"
       key={product.id}
       prefetch="intent"
       to={variantUrl}
     >
-      {image && (
+      {image ? (
         <Image
           alt={image.altText || product.title}
           aspectRatio="1/1"
@@ -34,11 +36,34 @@ export function ProductItem({
           loading={loading}
           sizes="(min-width: 45em) 400px, 100vw"
         />
+      ) : (
+        <ProductPlaceholderImage />
       )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
+      <h3 className="bb-product-card__title">{product.title}</h3>
+      <div className="bb-product-card__price">
+        {pricing && pricing.price !== null ? (
+          <>
+            {formatUsd(pricing.price)} <small>{pricing.unit}</small>
+          </>
+        ) : (
+          <Money data={product.priceRange.minVariantPrice} />
+        )}
+      </div>
     </Link>
+  );
+}
+
+/** Branded stand-in for products without a photo. */
+export function ProductPlaceholderImage() {
+  return (
+    <div className="bb-product-card__placeholder" aria-hidden="true">
+      <img
+        src="/images/bagbuddy-logo-white.png"
+        alt=""
+        width={640}
+        height={304}
+        loading="lazy"
+      />
+    </div>
   );
 }
