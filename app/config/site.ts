@@ -15,11 +15,8 @@ export const SITE = {
   /** Public contact email shown in the footer and on the booking page. */
   email: 'jandzbagpickup@gmail.com',
 
-  /**
-   * TODO(Jason): business phone number, e.g. '(719) 555-0123'.
-   * While null, the click-to-call buttons are replaced with an email link.
-   */
-  phone: null as string | null,
+  /** Business phone, shown on every click-to-call button. */
+  phone: '(719) 419-2257' as string | null,
 
   /**
    * TODO(Jason): Google review rating and count, e.g. 4.9 and 120.
@@ -47,7 +44,8 @@ export const SITE = {
 
 /** Turns a display phone number into a tel: href. */
 export function phoneHref(phone: string): string {
-  return `tel:${phone.replace(/[^\d+]/g, '')}`;
+  const digits = phone.replace(/\D/g, '');
+  return `tel:${digits.length === 10 ? `+1${digits}` : `+${digits}`}`;
 }
 
 /** Where the two main homepage buttons go. */

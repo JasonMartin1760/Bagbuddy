@@ -5,6 +5,10 @@ import {
   type ServiceAreaId,
 } from '~/data/serviceAreas';
 
+// Only served areas are drawn. Denver metro (coming soon) is left off the
+// map until version 2.
+const MAP_AREAS = SERVICE_AREAS.filter((area) => area.status === 'served');
+
 /**
  * Lightweight inline-SVG map of Colorado with the Bag Buddy service areas.
  * No map library or API key. Hover, focus or tap an area to see its name;
@@ -42,7 +46,6 @@ const I25: Array<[number, number]> = [
 ];
 
 const CITY_DOTS: Array<{name: string; lat: number; lon: number}> = [
-  {name: 'Denver', lat: 39.74, lon: -104.99},
   {name: 'Colorado Springs', lat: 38.83, lon: -104.82},
   {name: 'Woodland Park', lat: 38.99, lon: -105.06},
 ];
@@ -54,7 +57,7 @@ export function ServiceMap({
 }) {
   const [hovered, setHovered] = useState<ServiceAreaId | null>(null);
   const activeId = hovered ?? highlightedArea ?? null;
-  const active = SERVICE_AREAS.find((area) => area.id === activeId);
+  const active = MAP_AREAS.find((area) => area.id === activeId);
 
   const i25Path = I25.map(([lat, lon], i) => {
     const {x, y} = project(lat, lon);
@@ -66,7 +69,7 @@ export function ServiceMap({
       <svg
         viewBox={`0 0 ${WIDTH + PAD * 2} ${HEIGHT + PAD * 2}`}
         role="group"
-        aria-label="Map of Colorado showing Bag Buddy service areas: Denver metro, Colorado Springs and Woodland Park"
+        aria-label="Map of Colorado showing Bag Buddy service areas: Colorado Springs and Woodland Park"
       >
         <rect
           className="bb-map__state"
@@ -92,7 +95,7 @@ export function ServiceMap({
         >
           I-25
         </text>
-        {SERVICE_AREAS.map((area) => (
+        {MAP_AREAS.map((area) => (
           <AreaMarker
             key={area.id}
             area={area}
@@ -129,7 +132,7 @@ export function ServiceMap({
         )}
       </figcaption>
       <ul className="bb-map__legend">
-        {SERVICE_AREAS.map((area) => (
+        {MAP_AREAS.map((area) => (
           <li key={area.id}>
             <button
               type="button"

@@ -676,6 +676,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 .bb-split {
   display: grid;
   gap: 2rem;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 @media (min-width: 56em) {
@@ -1033,6 +1034,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 /* Product page */
 .bb-pdp__top {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.75rem;
   padding-bottom: 2.5rem;
   padding-top: 1.5rem;
@@ -1203,4 +1205,53 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 aside header h3 {
   font-family: var(--bb-font-heading);
   color: var(--bb-purple);
+}
+
+/* Coming-soon zip result (Denver metro) */
+.bb-zip__msg--soon {
+  background: #fffbd6;
+  border-left: 6px solid var(--bb-yellow-dark);
+  color: var(--bb-purple-darker);
+}
+
+.bb-zip__soon-title {
+  color: var(--bb-purple);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.bb-zip__msg--soon p + p {
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.bb-zip__soon-cta {
+  margin-top: 0.6rem;
+}
+
+/* Area price card on /book-pickup */
+.bb-book__area {
+  background: var(--bb-purple-tint);
+  border-radius: 12px;
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+}
+
+.bb-book__area-label {
+  font-weight: 700;
+  margin: 0;
+}
+
+.bb-book__area-price {
+  color: var(--bb-purple);
+  font-family: var(--bb-font-heading);
+  font-size: 2rem;
+  margin: 0.2rem 0 0.75rem;
+}
+
+.bb-book__area-price small {
+  color: var(--bb-muted);
+  font-family: var(--bb-font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
 }

@@ -1,11 +1,24 @@
 /**
- * Bag Buddy Dumpsters service-area zip codes (157 zips).
+ * Bag Buddy Dumpsters service-area zip codes (180 zips). Pricing is by
+ * county: each zip belongs to the area of its county.
  *
- * Generated from the Census 2020 ZCTA-to-county relationship file.
- * Areas are defined by county.
- * TODO(Jason): confirm the list. Military / unique-use zips 80840, 80913,
- * 80914, 80045, 80264, 80266, 80290, 80293, 80294 are included as-is, and
- * 23 primary city names are unverified (city is not shown on the site).
+ * - Colorado Springs area = El Paso County (63 zips)
+ * - Woodland Park area = Teller County (6 zips)
+ * - Denver metro = Denver, Adams, Arapahoe, Jefferson, Douglas and
+ *   Broomfield counties (111 zips), status 'coming-soon': not served yet
+ *
+ * Source: Census 2020 ZCTA-to-county relationship file. A ZCTA that spans
+ * counties is assigned to the county holding most of its land area (e.g.
+ * 80863 Woodland Park is 71% Teller / 29% El Paso -> Woodland Park; 80819
+ * Green Mountain Falls is 94% El Paso -> Colorado Springs). PO Box and
+ * unique (single-organization) zips have no ZCTA, so the El Paso and Teller
+ * ones were added from the USPS county zip list (80901, 80912, 80841,
+ * 80931-80937, 80941, 80942, 80946, 80947, 80949, 80950, 80960, 80962,
+ * 80970, 80977, 80995, 80997, and 80866 for Teller).
+ *
+ * TODO(Jason): confirm the list. Military / unique-use zips are included
+ * as-is, and some primary city names are unverified (city is not shown on
+ * the site).
  */
 
 export type ServiceAreaId =
@@ -605,6 +618,12 @@ export const SERVICE_ZIPS: readonly ServiceZip[] = [
     county: 'El Paso County',
   },
   {
+    zip: '80841',
+    area: 'colorado-springs',
+    city: 'USAF Academy',
+    county: 'El Paso County',
+  },
+  {
     zip: '80860',
     area: 'woodland-park',
     city: 'Victor',
@@ -620,6 +639,18 @@ export const SERVICE_ZIPS: readonly ServiceZip[] = [
     zip: '80864',
     area: 'colorado-springs',
     city: 'Yoder',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80866',
+    area: 'woodland-park',
+    city: 'Woodland Park',
+    county: 'Teller County',
+  },
+  {
+    zip: '80901',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
     county: 'El Paso County',
   },
   {
@@ -680,6 +711,12 @@ export const SERVICE_ZIPS: readonly ServiceZip[] = [
     zip: '80911',
     area: 'colorado-springs',
     city: 'Colorado springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80912',
+    area: 'colorado-springs',
+    city: 'Colorado Springs (Schriever SFB)',
     county: 'El Paso County',
   },
   {
@@ -791,6 +828,48 @@ export const SERVICE_ZIPS: readonly ServiceZip[] = [
     county: 'El Paso County',
   },
   {
+    zip: '80931',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80932',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80933',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80934',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80935',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80936',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80937',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
     zip: '80938',
     area: 'colorado-springs',
     city: 'Colorado Springs',
@@ -803,7 +882,79 @@ export const SERVICE_ZIPS: readonly ServiceZip[] = [
     county: 'El Paso County',
   },
   {
+    zip: '80941',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80942',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80946',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80947',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80949',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80950',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
     zip: '80951',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80960',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80962',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80970',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80977',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80995',
+    area: 'colorado-springs',
+    city: 'Colorado Springs',
+    county: 'El Paso County',
+  },
+  {
+    zip: '80997',
     area: 'colorado-springs',
     city: 'Colorado Springs',
     county: 'El Paso County',
@@ -822,9 +973,13 @@ export function findServiceZip(zip: string): ServiceZip | undefined {
   return ZIP_INDEX.get(zip.trim());
 }
 
+export type ServiceStatus = 'served' | 'coming-soon';
+
 export interface ServiceArea {
   id: ServiceAreaId;
   label: string;
+  /** 'coming-soon' areas are recognized but not booked or priced yet. */
+  status: ServiceStatus;
   counties: readonly string[];
   /** Approximate center, used to place the area on the service map. */
   lat: number;
@@ -837,6 +992,8 @@ export const SERVICE_AREAS: readonly ServiceArea[] = [
   {
     id: 'denver-metro',
     label: 'Denver metro',
+    // Jason: Denver is not served yet; planned soon.
+    status: 'coming-soon',
     counties: [
       'Denver',
       'Adams',
@@ -852,6 +1009,7 @@ export const SERVICE_AREAS: readonly ServiceArea[] = [
   {
     id: 'colorado-springs',
     label: 'Colorado Springs',
+    status: 'served',
     counties: ['El Paso'],
     lat: 38.85,
     lon: -104.72,
@@ -860,6 +1018,7 @@ export const SERVICE_AREAS: readonly ServiceArea[] = [
   {
     id: 'woodland-park',
     label: 'Woodland Park',
+    status: 'served',
     counties: ['Teller'],
     lat: 38.99,
     lon: -105.06,

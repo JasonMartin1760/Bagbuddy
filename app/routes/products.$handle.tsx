@@ -25,6 +25,7 @@ import {
   PRODUCT_PRICING,
   findProductPricing,
   formatUsd,
+  isPickupKind,
   type ProductKind,
   type ProductPricing,
 } from '~/config/pricing';
@@ -216,7 +217,11 @@ function PlannedProduct({pricing}: {pricing: ProductPricing}) {
                 {formatUsd(pricing.price)} <small>{pricing.unit}</small>
               </p>
             </div>
-          ) : null}
+          ) : (
+            <p className="bb-pdp__summary">
+              <strong>Call or book for your pickup price.</strong>
+            </p>
+          )}
           <p className="bb-pdp__summary">{content.summary}</p>
           <ul className="bb-pdp__highlights">
             {content.highlights.map((item) => (
@@ -225,8 +230,12 @@ function PlannedProduct({pricing}: {pricing: ProductPricing}) {
           </ul>
           <div className="bb-notice" role="status">
             <p>
-              <strong>Online ordering is coming soon.</strong> Contact us to
-              order today.
+              <strong>
+                Online {isPickupKind(pricing.kind) ? 'booking' : 'ordering'} is
+                coming soon.
+              </strong>{' '}
+              Call or email us to{' '}
+              {isPickupKind(pricing.kind) ? 'book your pickup' : 'order'} today.
             </p>
             <div className="bb-cta-row">
               <CallButton />
@@ -247,6 +256,15 @@ function PlannedProduct({pricing}: {pricing: ProductPricing}) {
 }
 
 function ProductCrossLinks({kind}: {kind?: ProductKind}) {
+  if (kind && isPickupKind(kind)) {
+    return (
+      <p className="bb-muted bb-pdp__cross">
+        Pickup is priced by county.{' '}
+        <Link to={BOOK_PICKUP_PATH}>Check your zip code</Link> to make sure this
+        is your area. <Link to={BUY_BAG_PATH}>Need a bag?</Link>
+      </p>
+    );
+  }
   if (kind === 'dumpster-bag' || !kind) {
     return (
       <p className="bb-muted bb-pdp__cross">

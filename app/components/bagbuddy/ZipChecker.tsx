@@ -8,16 +8,21 @@ import {
   type ServiceZip,
 } from '~/data/serviceAreas';
 import {PICKUP_STARTING_PRICE, formatUsd} from '~/config/pricing';
+import {CallButton} from '~/components/bagbuddy/ContactButton';
 
 type Result =
   | {status: 'idle'}
   | {status: 'invalid'}
   | {status: 'unserved'; zip: string}
+  | {status: 'coming-soon'; match: ServiceZip}
   | {status: 'served'; match: ServiceZip};
 
 /**
  * Client-side zip code checker: validates 5 digits, looks the zip up in the
  * service-area list and shows the starting pickup price for that area.
+ * - Served area (El Paso / Teller county zips): green message + price.
+ * - Coming-soon area (Denver metro): "coming soon" message + call option.
+ * - Any other zip: "We're sorry, we do not serve this area."
  */
 export function ZipChecker({
   heading,
@@ -28,7 +33,8 @@ export function ZipChecker({
 }: {
   heading: string;
   helpText?: string;
-  onAreaChange?: (area: ServiceAreaId | null) => void;
+  /** Called after each check with the matched zip (served or coming soon), or null. */
+  onAreaChange?: (match: ServiceZip | null) => void;
   headingLevel?: 'h1' | 'h2';
   initialZip?: string;
 }) {
@@ -42,7 +48,11 @@ export function ZipChecker({
     event.preventDefault();
     const next = checkZip(zip);
     setResult(next.status === 'idle' ? {status: 'invalid'} : next);
-    onAreaChange?.(next.status === 'served' ? next.match.area : null);
+    onAreaChange?.(
+      next.status === 'served' || next.status === 'coming-soon'
+        ? next.match
+        : null,
+    );
   }
 
   return (
@@ -84,12 +94,30 @@ export function ZipChecker({
   );
 }
 
+/** True when the zip's area is open for booking. */
+export function isServedZip(match: ServiceZip | null): match is ServiceZip {
+  return !!match && getServiceArea(match.area).status === 'served';
+}
+
+/**
+ * Book Pickup link that carries a served zip and its area, so the booking
+ * page shows that area's price and pickup checkout.
+ */
+export function bookPickupHref(match: ServiceZip | null): string {
+  return isServedZip(match)
+    ? `/book-pickup?zip=${match.zip}&area=${match.area}`
+    : '/book-pickup';
+}
+
 function checkZip(raw: string): Result {
   const value = raw.trim();
   if (!value) return {status: 'idle'};
   if (!isValidZip(value)) return {status: 'invalid'};
   const match = findServiceZip(value);
-  return match ? {status: 'served', match} : {status: 'unserved', zip: value};
+  if (!match) return {status: 'unserved', zip: value};
+  return isServedZip(match)
+    ? {status: 'served', match}
+    : {status: 'coming-soon', match};
 }
 
 function ZipResult({result}: {result: Result}) {
@@ -105,8 +133,21 @@ function ZipResult({result}: {result: Result}) {
     case 'unserved':
       return (
         <p className="bb-zip__msg bb-zip__msg--error">
-          We&rsquo;re sorry, we do not serve this area yet.
+          We&rsquo;re sorry, we do not serve this area.
         </p>
+      );
+    case 'coming-soon':
+      return (
+        <div className="bb-zip__msg bb-zip__msg--soon">
+          <p className="bb-zip__soon-title">Coming soon to your area</p>
+          <p>
+            We&rsquo;re not offering service in your area yet, but we plan to
+            offer service in this area soon.
+          </p>
+          <div className="bb-zip__soon-cta">
+            <CallButton />
+          </div>
+        </div>
       );
     case 'served': {
       const {match} = result;
@@ -122,7 +163,7 @@ function ZipResult({result}: {result: Result}) {
           </p>
           <p className="bb-zip__where">
             {area.label} area · {match.zip} ·{' '}
-            <Link to={`/book-pickup?zip=${match.zip}`}>Book a pickup</Link>
+            <Link to={bookPickupHref(match)}>Book a pickup</Link>
           </p>
         </div>
       );

@@ -11,10 +11,16 @@ import type {ServiceAreaId} from '~/data/serviceAreas';
  * Do not add numbers here that Jason has not confirmed.
  */
 
-export type ProductKind =
+/** Products sold on the Buy Bags page. */
+export type ShopProductKind =
   | 'dumpster-bag'
   | 'electronics-addon'
   | 'mattress-addon';
+
+/** One pickup-service product per service area (priced by county). */
+export type PickupKind = 'pickup-colorado-springs' | 'pickup-woodland-park';
+
+export type ProductKind = ShopProductKind | PickupKind;
 
 export interface ProductPricing {
   kind: ProductKind;
@@ -29,7 +35,22 @@ export interface ProductPricing {
   price: number | null;
   /** Short unit label shown after the price. */
   unit: string;
+  /** Service area, for pickup products. */
+  area?: ServiceAreaId;
 }
+
+/**
+ * Starting pickup price per service area (USD), by county via zip code.
+ * Jason confirmed: Colorado Springs area (El Paso County) $130, Woodland
+ * Park area (Teller County) $150.
+ * Denver metro is not served yet ("coming soon"), so it has no price and
+ * no pickup product. TODO(Jason): set a price when Denver opens.
+ */
+export const PICKUP_STARTING_PRICE: Record<ServiceAreaId, number | null> = {
+  'colorado-springs': 130,
+  'woodland-park': 150,
+  'denver-metro': null,
+};
 
 export const PRODUCT_PRICING: Record<ProductKind, ProductPricing> = {
   'dumpster-bag': {
@@ -61,26 +82,59 @@ export const PRODUCT_PRICING: Record<ProductKind, ProductPricing> = {
     price: 80,
     unit: 'apiece (each one)',
   },
+  'pickup-colorado-springs': {
+    kind: 'pickup-colorado-springs',
+    handle: 'pickup-colorado-springs',
+    tag: 'bagbuddy-pickup-colorado-springs',
+    title: 'Bag Pickup – Colorado Springs Area',
+    label: 'Pickup, Colorado Springs area (El Paso County)',
+    price: PICKUP_STARTING_PRICE['colorado-springs'],
+    unit: 'starting price, per bag',
+    area: 'colorado-springs',
+  },
+  'pickup-woodland-park': {
+    kind: 'pickup-woodland-park',
+    handle: 'pickup-woodland-park',
+    tag: 'bagbuddy-pickup-woodland-park',
+    title: 'Bag Pickup – Woodland Park Area',
+    label: 'Pickup, Woodland Park area (Teller County)',
+    price: PICKUP_STARTING_PRICE['woodland-park'],
+    unit: 'starting price, per bag',
+    area: 'woodland-park',
+  },
 };
 
 export const PRODUCT_KINDS = Object.keys(PRODUCT_PRICING) as ProductKind[];
+
+/** The products shown on the Buy Bags page, in order. */
+export const SHOP_PRODUCT_KINDS: readonly ShopProductKind[] = [
+  'dumpster-bag',
+  'electronics-addon',
+  'mattress-addon',
+];
+
+export const PICKUP_KIND_BY_AREA: Partial<Record<ServiceAreaId, PickupKind>> = {
+  'colorado-springs': 'pickup-colorado-springs',
+  'woodland-park': 'pickup-woodland-park',
+};
+
+/** Pickup product for a served area (undefined for coming-soon areas). */
+export function getPickupPricing(
+  area: ServiceAreaId,
+): ProductPricing | undefined {
+  const kind = PICKUP_KIND_BY_AREA[area];
+  return kind ? PRODUCT_PRICING[kind] : undefined;
+}
+
+export function isPickupKind(kind: ProductKind): kind is PickupKind {
+  return kind.startsWith('pickup-');
+}
 
 /** Fees shown in the homepage "Additional Fees" list. */
 export const ADDITIONAL_FEES: readonly ProductPricing[] = [
   PRODUCT_PRICING['electronics-addon'],
   PRODUCT_PRICING['mattress-addon'],
 ];
-
-/**
- * TODO(Jason): starting pickup price per service area (USD).
- * While null, a served zip shows "Call or book for your pickup price"
- * instead of a dollar amount.
- */
-export const PICKUP_STARTING_PRICE: Record<ServiceAreaId, number | null> = {
-  'colorado-springs': null,
-  'woodland-park': null,
-  'denver-metro': null,
-};
 
 /** Finds the price entry for a Shopify product by handle or tag. */
 export function findProductPricing(product: {

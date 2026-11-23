@@ -50,9 +50,11 @@ export function Footer(_props: FooterProps) {
         <div>
           <h2 className="bb-footer__title">Service areas</h2>
           <ul className="bb-footer__list">
-            {SERVICE_AREAS.map((area) => (
-              <li key={area.id}>{area.label}, CO</li>
-            ))}
+            {SERVICE_AREAS.filter((area) => area.status === 'served').map(
+              (area) => (
+                <li key={area.id}>{area.label}, CO</li>
+              ),
+            )}
           </ul>
         </div>
         <div>

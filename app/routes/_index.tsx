@@ -2,13 +2,17 @@ import {useState} from 'react';
 import {Link} from 'react-router';
 import type {Route} from './+types/_index';
 import {ServiceMap} from '~/components/bagbuddy/ServiceMap';
-import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
+import {
+  ZipChecker,
+  bookPickupHref,
+  isServedZip,
+} from '~/components/bagbuddy/ZipChecker';
 import {
   AllowedLists,
   BulletList,
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
-import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
+import {BUY_BAG_PATH, SITE} from '~/config/site';
 import {PRODUCT_PRICING, formatUsd} from '~/config/pricing';
 import {
   ALLOWED,
@@ -17,7 +21,7 @@ import {
   PLACEMENT,
   WHY_DURABAG,
 } from '~/data/content';
-import type {ServiceAreaId} from '~/data/serviceAreas';
+import type {ServiceZip} from '~/data/serviceAreas';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -25,13 +29,15 @@ export const meta: Route.MetaFunction = () => {
     {
       name: 'description',
       content:
-        'Buy a dumpster bag, fill it on your own time and book a pickup. Serving the Denver metro, Colorado Springs and Woodland Park.',
+        'Buy a dumpster bag, fill it on your own time and book a pickup. Serving Colorado Springs (El Paso County) and Woodland Park (Teller County).',
     },
   ];
 };
 
 export default function Homepage() {
-  const [matchedArea, setMatchedArea] = useState<ServiceAreaId | null>(null);
+  const [match, setMatch] = useState<ServiceZip | null>(null);
+  const matchedArea = isServedZip(match) ? match.area : null;
+  const bookHref = bookPickupHref(match);
   const bag = PRODUCT_PRICING['dumpster-bag'];
 
   const hero = SITE.heroImage;
@@ -64,7 +70,7 @@ export default function Homepage() {
             <ZipChecker
               heading="Check cost and if we serve your area"
               helpText="Enter your zip code to check if we serve your area and see your exact pickup price"
-              onAreaChange={setMatchedArea}
+              onAreaChange={setMatch}
             />
           </div>
           <div className="bb-hero__ctas">
@@ -76,7 +82,7 @@ export default function Homepage() {
             </Link>
             <Link
               className="bb-btn bb-btn--outline-light bb-btn--lg"
-              to={BOOK_PICKUP_PATH}
+              to={bookHref}
             >
               Book Pickup Service
             </Link>
@@ -154,7 +160,7 @@ export default function Homepage() {
                   </Link>
                 ) : null}
                 {index === 2 ? (
-                  <Link className="bb-step__link" to={BOOK_PICKUP_PATH}>
+                  <Link className="bb-step__link" to={bookHref}>
                     Book pickup →
                   </Link>
                 ) : null}
@@ -177,10 +183,7 @@ export default function Homepage() {
             >
               Buy a Dumpster Bag Now
             </Link>
-            <Link
-              className="bb-btn bb-btn--outline bb-btn--lg"
-              to={BOOK_PICKUP_PATH}
-            >
+            <Link className="bb-btn bb-btn--outline bb-btn--lg" to={bookHref}>
               Book Pickup Service
             </Link>
           </div>

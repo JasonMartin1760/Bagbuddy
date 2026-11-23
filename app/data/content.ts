@@ -114,8 +114,33 @@ const CONTENT_BY_KIND: Record<ProductKind | 'generic', ProductContent> = {
       {type: 'allowed'},
     ],
   },
+  'pickup-colorado-springs': pickupContent(
+    'pickup-colorado-springs',
+    'the Colorado Springs area (El Paso County)',
+  ),
+  'pickup-woodland-park': pickupContent(
+    'pickup-woodland-park',
+    'the Woodland Park area (Teller County)',
+  ),
   generic: {...BAG_CONTENT, kind: 'generic'},
 };
+
+function pickupContent(kind: ProductKind, where: string): ProductContent {
+  return {
+    kind,
+    summary: `Crane-truck pickup of your filled dumpster bag in ${where}. Pickup is priced by county, based on your zip code.`,
+    highlights: [
+      'Priced by your zip code’s county',
+      'Our crane truck lifts the bag from your driveway or alley',
+      'Add-on fees apply for TVs and mattresses',
+    ],
+    blocks: [
+      {type: 'list', title: PLACEMENT.title, items: PLACEMENT.points},
+      {type: 'list', title: HOW_FULL.title, items: HOW_FULL.points},
+      {type: 'allowed'},
+    ],
+  };
+}
 
 /** Content for a product, matched by handle or tag; falls back to bag copy. */
 export function getProductContent(product: {

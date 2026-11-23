@@ -5,11 +5,11 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem, ProductPlaceholderImage} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {
-  PRODUCT_KINDS,
+  SHOP_PRODUCT_KINDS,
   PRODUCT_PRICING,
   findProductPricing,
   formatUsd,
-  type ProductKind,
+  type ShopProductKind,
 } from '~/config/pricing';
 import {BOOK_PICKUP_PATH, SITE} from '~/config/site';
 
@@ -49,7 +49,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
       },
     }),
   ]);
-  const featured: Record<ProductKind, CollectionItemFragment | null> = {
+  const featured: Record<ShopProductKind, CollectionItemFragment | null> = {
     'dumpster-bag': bagBuddy.bag ?? null,
     'electronics-addon': bagBuddy.electronics ?? null,
     'mattress-addon': bagBuddy.mattress ?? null,
@@ -86,7 +86,7 @@ export default function Collection() {
       <section className="bb-section">
         <div className="bb-container">
           <div className="products-grid bb-products-grid">
-            {PRODUCT_KINDS.map((kind) => {
+            {SHOP_PRODUCT_KINDS.map((kind) => {
               const product = featured[kind];
               return product ? (
                 <ProductItem key={kind} product={product} loading="eager" />
@@ -123,7 +123,7 @@ export default function Collection() {
 }
 
 /** Card for a Bag Buddy product that is not in Shopify yet. */
-function PlannedProductCard({kind}: {kind: ProductKind}) {
+function PlannedProductCard({kind}: {kind: ShopProductKind}) {
   const pricing = PRODUCT_PRICING[kind];
   return (
     <Link
