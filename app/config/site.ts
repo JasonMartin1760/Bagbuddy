@@ -42,6 +42,33 @@ export const SITE = {
     fallbackSrc: '/images/hero-placeholder.jpg' as string | null,
     alt: 'Bag Buddy Dumpsters logo: a crane hook lifting the word Bag',
   },
+
+  /**
+   * Main product image on the Buy a Bag page (a local static file, so it always
+   * shows even though the store's product image isn't reachable from here).
+   * TODO(Jason): PLACEHOLDER. This photo is Sandbag Express's product image
+   * (cropped from sandbagexpress.com). Replace it with your own photo of the
+   * bag: drop it in /public/images and update these lines.
+   */
+  bagImage: {
+    src: '/images/bag-yellow-dumpster-bag.webp',
+    fallbackSrc: '/images/bag-yellow-dumpster-bag.jpg',
+    alt: 'Bag Buddy yellow dumpster bag',
+    width: 1000,
+    height: 1000,
+  },
+
+  /**
+   * Jason's own photo of the Bag Buddy truck craning a full bag (sky cropped,
+   * resized to 1200px tall, metadata stripped). Used in About and How It Works.
+   */
+  truckImage: {
+    src: '/images/bag-buddy-crane-truck.webp',
+    fallbackSrc: '/images/bag-buddy-crane-truck.jpg',
+    alt: 'Bag Buddy crane truck lifting a full dumpster bag in Colorado Springs',
+    width: 782,
+    height: 1200,
+  },
 } as const;
 
 /** Turns a display phone number into a tel: href. */
