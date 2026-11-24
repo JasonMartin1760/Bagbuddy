@@ -2,6 +2,7 @@ import {Link, useLoaderData, useSearchParams} from 'react-router';
 import type {Route} from './+types/book-pickup';
 import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
+import {ContactSheet} from '~/components/ContactSheet';
 import {BulletList} from '~/components/bagbuddy/InfoBlocks';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
 import {loadFeeVariants} from '~/lib/feeVariants';
@@ -128,6 +129,7 @@ export default function BookPickup() {
             Filled your bag? Enter your zip code to see your pickup price, add
             any extra items, then check out. Or give us a call.
           </p>
+          <p className="bb-page__promise">{SITE.pickupPromise}</p>
         </div>
       </section>
 
@@ -199,6 +201,24 @@ export default function BookPickup() {
               <Link to={BUY_BAG_PATH}>Buy a dumpster bag</Link>.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="bb-specific-day" aria-labelledby="specific-day-title">
+        <div className="bb-container bb-book bb-specific-day__inner">
+          <div>
+            <h2 id="specific-day-title" className="bb-specific-day__title">
+              Need a specific day or time?
+            </h2>
+            <p>
+              Just ask. We&rsquo;ll do our best to work with your schedule.
+            </p>
+          </div>
+          <ContactSheet
+            label="Contact us"
+            buttonClassName="bb-btn bb-btn--lg bb-specific-day__btn"
+            title="Ask about a specific day or time"
+          />
         </div>
       </section>
 

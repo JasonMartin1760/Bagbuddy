@@ -55,7 +55,7 @@ export const HOW_IT_WORKS = [
   {title: 'Fill the bag', text: 'Fill it on your own time, at your own pace.'},
   {
     title: 'Schedule pickup',
-    text: 'Book a pickup and our crane truck hauls it away.',
+    text: 'Book a pickup and our crane truck hauls it away. We pick up most bags within three business days.',
   },
 ] as const;
 
@@ -163,6 +163,7 @@ function pickupContent(kind: ProductKind, where: string): ProductContent {
       'Priced by your zip code’s county',
       'Our crane truck lifts the bag from your driveway or alley',
       'Add-on fees apply for TVs and mattresses',
+      'We pick up most bags within three business days',
     ],
     blocks: [
       {type: 'list', title: PLACEMENT.title, items: PLACEMENT.points},
