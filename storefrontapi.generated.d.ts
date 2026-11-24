@@ -716,6 +716,20 @@ export type BagBuddyProductsQuery = {
   >;
 };
 
+export type DumpsterBagPickupProductQueryVariables = StorefrontAPI.Exact<{
+  handle: StorefrontAPI.Scalars['String']['input'];
+}>;
+
+export type DumpsterBagPickupProductQuery = {
+  product?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Product, 'id' | 'handle' | 'title'> & {
+      selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'>
+      >;
+    }
+  >;
+};
+
 export type PageQueryVariables = StorefrontAPI.Exact<{
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
@@ -1293,6 +1307,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query BagBuddyProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $bag: String!\n    $electronics: String!\n    $mattress: String!\n  ) @inContext(country: $country, language: $language) {\n    bag: product(handle: $bag) {\n      ...CollectionItem\n    }\n    electronics: product(handle: $electronics) {\n      ...CollectionItem\n    }\n    mattress: product(handle: $mattress) {\n      ...CollectionItem\n    }\n  }\n  #graphql\n  fragment MoneyCollectionItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment CollectionItem on Product {\n    id\n    handle\n    title\n    tags\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyCollectionItem\n      }\n      maxVariantPrice {\n        ...MoneyCollectionItem\n      }\n    }\n  }\n\n': {
     return: BagBuddyProductsQuery;
     variables: BagBuddyProductsQueryVariables;
+  };
+  '#graphql\n  query DumpsterBagPickupProduct($handle: String!) {\n    product(handle: $handle) {\n      id\n      handle\n      title\n      selectedOrFirstAvailableVariant {\n        id\n        availableForSale\n      }\n    }\n  }\n': {
+    return: DumpsterBagPickupProductQuery;
+    variables: DumpsterBagPickupProductQueryVariables;
   };
   '#graphql\n  query Page(\n    $language: LanguageCode,\n    $country: CountryCode,\n    $handle: String!\n  )\n  @inContext(language: $language, country: $country) {\n    page(handle: $handle) {\n      handle\n      id\n      title\n      body\n      seo {\n        description\n        title\n      }\n    }\n  }\n': {
     return: PageQuery;

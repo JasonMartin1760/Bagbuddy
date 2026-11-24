@@ -1307,3 +1307,100 @@ aside header h3 {
   margin: 1rem 0 0;
   text-align: center;
 }
+
+/* Dumpster bag pickup landing (/dumpster-bag-pickup) */
+.bb-landing-hero {
+  padding: 2rem 0 2.5rem;
+}
+
+.bb-landing-hero h1 {
+  font-size: clamp(1.85rem, 7vw, 3rem);
+  margin: 0 0 0.85rem;
+}
+
+.bb-landing-hero .bb-lead {
+  color: #fff;
+  margin: 0;
+}
+
+.bb-landing__prices {
+  color: #fff;
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin: 0.9rem 0 0;
+  max-width: 760px;
+}
+
+.bb-landing__checkout {
+  margin-top: 1.5rem;
+  max-width: 36rem;
+  scroll-margin-top: calc(var(--header-height) + 12px);
+}
+
+.bb-landing__checkout .bb-card {
+  color: var(--bb-ink);
+}
+
+.bb-landing__checkout-title {
+  color: var(--bb-purple);
+  font-size: clamp(1.35rem, 4.5vw, 1.85rem);
+  margin: 0 0 0.35rem;
+}
+
+.bb-landing__checkout .bb-book__area-price {
+  margin: 0.15rem 0 0.35rem;
+}
+
+.bb-landing__window {
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+
+.bb-landing__checkout .bb-btn {
+  max-width: 100%;
+  white-space: normal;
+  width: 100%;
+}
+
+.bb-landing__exception,
+.bb-landing__fallback {
+  color: var(--bb-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0.9rem 0 0;
+}
+
+.bb-landing__exception a,
+.bb-landing__fallback a {
+  color: var(--bb-purple);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.bb-landing__error {
+  color: var(--bb-red);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0;
+}
+
+.bb-landing-cta .bb-cta-row .bb-btn {
+  max-width: 100%;
+  white-space: normal;
+}
+
+.bb-landing__disclaimer {
+  color: var(--bb-muted);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 0 1.1rem 2.5rem;
+}
+
+@media (min-width: 48em) {
+  .bb-landing-hero {
+    padding: 3rem 0 3.25rem;
+  }
+}

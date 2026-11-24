@@ -82,7 +82,20 @@ export async function action({request, context}: Route.ActionArgs) {
   const {cart: cartResult, errors, warnings} = result;
 
   const redirectTo = formData.get('redirectTo') ?? null;
-  if (typeof redirectTo === 'string') {
+  const checkoutUrl = cartResult?.checkoutUrl;
+  const hasCartErrors = Array.isArray(errors) && errors.length > 0;
+
+  // Buy-now: after adding lines, send the shopper to Shopify checkout
+  // for the updated cart (used by the dumpster-bag pickup landing page).
+  if (
+    redirectTo === 'checkout' &&
+    typeof checkoutUrl === 'string' &&
+    checkoutUrl.length > 0 &&
+    !hasCartErrors
+  ) {
+    status = 303;
+    headers.set('Location', checkoutUrl);
+  } else if (typeof redirectTo === 'string' && redirectTo !== 'checkout') {
     status = 303;
     headers.set('Location', redirectTo);
   }
