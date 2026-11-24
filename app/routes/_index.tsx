@@ -73,7 +73,10 @@ export default function Homepage() {
         <div className="bb-hero__inner">
           <div className="bb-hero__intro">
             <h1 id="hero-title" className="bb-hero__title">
-              Dumpster bags. When you need it, where you need it.
+              <span className="bb-hero__title-main">Dumpster bags.</span>{' '}
+              <span className="bb-hero__title-sub">
+                When you need it, where you need it.
+              </span>
             </h1>
             {LOWEST_PICKUP_PRICE !== null ? (
               <p className="bb-hero__price">
@@ -125,9 +128,7 @@ export default function Homepage() {
                 <span className="bb-step__num" aria-hidden="true">
                   {index + 1}
                 </span>
-                {index === 2 ? (
-                  <TruckPhoto className="bb-step__photo" />
-                ) : null}
+                {index === 2 ? <TruckPhoto className="bb-step__photo" /> : null}
                 <h3>{step.title}</h3>
                 <p>{step.text}</p>
                 {index === 0 && bag.price !== null ? (

@@ -345,7 +345,7 @@ function ProductContentBlocks({blocks}: {blocks: readonly ContentBlock[]}) {
         const tint = index % 2 === 0 ? ' bb-section--tint' : '';
         if (block.type === 'allowed') {
           return (
-            <section key="allowed" className={`bb-section${tint}`}>
+            <section key="allowed" id="allowed" className={`bb-section${tint}`}>
               <div className="bb-container">
                 <h2 className="bb-section__title">{ALLOWED.title}</h2>
                 <p className="bb-section__intro">{ALLOWED.intro}</p>

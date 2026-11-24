@@ -420,13 +420,28 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 
 .bb-hero__intro {
   grid-area: intro;
+  text-align: center;
 }
 
+/* Centered two-line headline: big white "Dumpster bags." over a smaller
+   brand-yellow line. */
 .bb-hero__title {
   color: #fff;
-  font-size: clamp(1.7rem, 7vw, 2.9rem);
-  line-height: 1.1;
-  margin: 0.25rem 0 0.6rem;
+  line-height: 1.08;
+  margin: 0.35rem auto 0.7rem;
+  text-wrap: balance;
+}
+
+.bb-hero__title-main {
+  display: block;
+  font-size: clamp(2.3rem, 10vw, 4rem);
+}
+
+.bb-hero__title-sub {
+  color: var(--bb-yellow);
+  display: block;
+  font-size: clamp(1.35rem, 5.6vw, 2.2rem);
+  margin-top: 0.3rem;
   text-wrap: balance;
 }
 
@@ -438,45 +453,49 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   margin: 0;
 }
 
+/* Mobile: stacked, full width. */
 .bb-hero__ctas {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.7rem;
   grid-area: ctas;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .bb-hero__ctas .bb-btn {
-  font-size: 0.95rem;
-  padding: 0.75rem 0.75rem;
+  box-sizing: border-box;
+  font-size: 1.05rem;
+  min-width: 0;
+  padding: 0.8rem 1rem;
+  width: 100%;
 }
 
 .bb-hero__map {
   grid-area: map;
+  margin-top: 0.75rem;
 }
 
+/* Desktop: centered text and buttons, map card centered below. */
 @media (min-width: 56em) {
   .bb-hero {
-    padding: 3rem 0 3.5rem;
+    padding: 3.25rem 0 3.5rem;
   }
   .bb-hero__inner {
-    align-items: center;
-    column-gap: 2.5rem;
-    grid-template-areas:
-      'intro map'
-      'ctas map';
-    grid-template-rows: auto auto;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .bb-hero__intro {
-    align-self: end;
+    gap: 1.25rem;
+    justify-items: center;
   }
   .bb-hero__ctas {
-    align-self: start;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 0.75rem;
+    grid-template-columns: repeat(2, 280px);
+    justify-content: center;
+    margin-top: 0.5rem;
+    width: 100%;
   }
   .bb-hero__ctas .bb-btn {
     font-size: 1.1rem;
+  }
+  .bb-hero__map {
+    margin-top: 1.5rem;
+    max-width: 760px;
+    width: 100%;
   }
 }
 
@@ -2009,7 +2028,7 @@ aside header h3 {
 .bb-bag-sheet__inner {
   display: grid;
   gap: 0.7rem;
-  padding: 1rem 1rem 0.5rem;
+  padding: 2.6rem 1rem 0.4rem;
 }
 
 .bb-bag-sheet__inner form,
@@ -2069,17 +2088,39 @@ aside header h3 {
   margin: 0;
 }
 
-.bb-bag-sheet__close {
-  background: none;
-  border: 0;
+.bb-bag-sheet__allowed {
   color: var(--bb-purple);
-  cursor: pointer;
-  font-family: var(--bb-font-body);
   font-size: 0.9rem;
   font-weight: 700;
   justify-self: center;
   min-height: 40px;
+  padding-top: 0.55rem;
   text-decoration: underline;
+}
+
+/* Small X in the corner (Esc also closes the sheet). */
+.bb-bag-sheet__inner {
+  position: relative;
+}
+
+.bb-bag-sheet__x {
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid #d9d1f0;
+  border-radius: 50%;
+  color: var(--bb-purple);
+  cursor: pointer;
+  display: flex;
+  font-size: 1.1rem;
+  height: 30px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  position: absolute;
+  right: 0.55rem;
+  top: 0.5rem;
+  width: 30px;
+  z-index: 1;
 }
 
 /* ---------- Contact sheet (Call / Text / Email) ---------- */

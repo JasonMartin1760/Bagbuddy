@@ -6,6 +6,8 @@ import {formatUsd} from '~/config/pricing';
 import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
 
 const MAX_BAGS = 10;
+const ALLOWED_ID = 'allowed';
+const ALLOWED_HREF = `/#${ALLOWED_ID}`;
 
 /**
  * Bag page buy box: quantity, "Buy now" and "Add to cart". Either button
@@ -101,6 +103,14 @@ export function BagBuyBox({
         aria-label={mode === 'checkout' ? 'Checkout' : 'Add to cart'}
       >
         <div className="bb-bag-sheet__inner">
+          <button
+            type="button"
+            className="bb-bag-sheet__x"
+            aria-label="Close"
+            onClick={() => dialogRef.current?.close()}
+          >
+            ×
+          </button>
           <AddToCartButton
             className="bb-btn bb-btn--yellow bb-btn--lg bb-bag-sheet__go"
             disabled={!available}
@@ -126,13 +136,21 @@ export function BagBuyBox({
             Some items have extra disposal charges, such as mattresses and large
             electronics.
           </p>
-          <button
-            type="button"
-            className="bb-bag-sheet__close"
-            onClick={() => dialogRef.current?.close()}
+          <a
+            className="bb-bag-sheet__allowed"
+            href={ALLOWED_HREF}
+            onClick={(event) => {
+              // The bag page has the allowed / not-allowed lists below; close
+              // the sheet and scroll there. Otherwise follow the link home.
+              const target = document.getElementById(ALLOWED_ID);
+              if (!target) return;
+              event.preventDefault();
+              dialogRef.current?.close();
+              target.scrollIntoView({behavior: 'smooth', block: 'start'});
+            }}
           >
-            Go back
-          </button>
+            See what&rsquo;s allowed
+          </a>
         </div>
       </dialog>
     </div>
