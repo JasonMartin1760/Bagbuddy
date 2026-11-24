@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {Link} from 'react-router';
 import type {Route} from './+types/_index';
 import {ServiceMap} from '~/components/bagbuddy/ServiceMap';
+import {ContactSheet} from '~/components/ContactSheet';
 import {ZipChecker, isServedZip} from '~/components/bagbuddy/ZipChecker';
 import type {ServiceZip} from '~/data/serviceAreas';
 import {
@@ -147,6 +148,14 @@ export default function Homepage() {
               </li>
             ))}
           </ol>
+          <div className="bb-flex-line">
+            <p>{SITE.scheduleFlexLine}</p>
+            <ContactSheet
+              label="Contact us"
+              buttonClassName="bb-btn bb-btn--outline-light bb-flex-line__btn"
+              title="Ask about a pickup day"
+            />
+          </div>
         </div>
       </section>
 

@@ -2133,3 +2133,143 @@ aside header h3 {
   min-height: 44px;
   text-decoration: underline;
 }
+
+/* ---------- Contact sheet (Call / Text / Email) ---------- */
+.bb-contact-sheet {
+  border: 0;
+  border-radius: var(--bb-radius);
+  box-shadow: 0 20px 60px rgb(20 10 50 / 0.35);
+  box-sizing: border-box;
+  color: var(--bb-ink);
+  max-width: 420px;
+  padding: 0;
+  width: calc(100% - 2rem);
+}
+
+.bb-contact-sheet::backdrop {
+  background: rgb(24 14 60 / 0.6);
+}
+
+.bb-contact-sheet__inner {
+  padding: 1.4rem 1.25rem 1rem;
+}
+
+.bb-contact-sheet__title {
+  color: var(--bb-purple);
+  font-size: 1.4rem;
+  margin: 0 0 1rem;
+}
+
+.bb-contact-sheet__options {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.bb-contact-sheet__option {
+  align-items: flex-start;
+  background: var(--bb-purple);
+  border-radius: 14px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  justify-content: center;
+  min-height: 64px;
+  padding: 0.75rem 1.2rem;
+  text-decoration: none;
+}
+
+.bb-contact-sheet__option:hover {
+  background: var(--bb-purple-dark);
+  text-decoration: none;
+}
+
+.bb-contact-sheet__verb {
+  font-family: var(--bb-font-heading);
+  font-size: 1.35rem;
+}
+
+.bb-contact-sheet__detail {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.bb-contact-sheet__close {
+  background: none;
+  border: 0;
+  color: var(--bb-purple);
+  cursor: pointer;
+  display: block;
+  font-family: var(--bb-font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0.6rem auto 0;
+  min-height: 44px;
+  text-decoration: underline;
+}
+
+/* Book a Pickup: "Need a specific day or time?" */
+.bb-specific-day {
+  background: linear-gradient(
+    140deg,
+    var(--bb-purple) 0%,
+    var(--bb-purple-darker) 100%
+  );
+  border-top: 5px solid var(--bb-yellow);
+  color: #fff;
+  padding: 2.25rem 0;
+}
+
+.bb-specific-day__inner {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  justify-content: space-between;
+}
+
+.bb-specific-day__title {
+  color: #fff;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  margin: 0 0 0.3rem;
+}
+
+.bb-specific-day p {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.bb-btn.bb-specific-day__btn {
+  background: #fff;
+  color: var(--bb-purple);
+}
+
+.bb-btn.bb-specific-day__btn:hover {
+  background: var(--bb-purple-tint);
+}
+
+.bb-page__promise {
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+/* Homepage flexibility line under How It Works */
+.bb-flex-line {
+  align-items: center;
+  border-top: 1px solid rgb(255 255 255 / 0.18);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  justify-content: center;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  text-align: center;
+}
+
+.bb-flex-line p {
+  font-size: 1.02rem;
+  margin: 0;
+}
