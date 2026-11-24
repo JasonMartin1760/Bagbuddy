@@ -1,4 +1,4 @@
-import type {ServiceAreaId} from '~/data/serviceAreas';
+import type {ServiceAreaId} from '~/data/serviceAreaList';
 
 /**
  * Bag Buddy Dumpsters: authoritative prices.

@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {NAV_ITEMS, SITE, phoneHref} from '~/config/site';
-import {SERVICE_AREAS} from '~/data/serviceAreas';
+import {SERVICE_AREAS} from '~/data/serviceAreaList';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -20,6 +20,10 @@ export function Footer(_props: FooterProps) {
       <div className="bb-footer__inner">
         <div className="bb-footer__brand">
           <picture>
+            <source
+              srcSet="/images/bagbuddy-logo-white.avif"
+              type="image/avif"
+            />
             <source
               srcSet="/images/bagbuddy-logo-white.webp"
               type="image/webp"

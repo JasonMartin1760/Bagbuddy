@@ -38,11 +38,21 @@ const PICKUP_VARIANT_QUERY = `#graphql
 
 export async function loader({context, request}: Route.LoaderArgs) {
   const canonicalUrl = new URL(PAGE_PATH, request.url).href;
+  const {storefront} = context;
+  // Ad landing page: serve the variant lookups from Oxygen's cache so the
+  // page doesn't wait on the Storefront API. Variant IDs don't change;
+  // availability refreshes in the background every few minutes.
+  const cache = storefront.CacheCustom({
+    mode: 'public',
+    maxAge: 300,
+    staleWhileRevalidate: 86400,
+  });
   const [{product}, feeVariants] = await Promise.all([
-    context.storefront.query(PICKUP_VARIANT_QUERY, {
+    storefront.query(PICKUP_VARIANT_QUERY, {
       variables: {handle: PICKUP.handle},
+      cache,
     }),
-    loadFeeVariants(context.storefront),
+    loadFeeVariants(storefront, cache),
   ]);
   const variant = product?.selectedOrFirstAvailableVariant;
 

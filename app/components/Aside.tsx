@@ -30,13 +30,32 @@ export function Aside({
   children,
   heading,
   type,
+  deferContent = false,
 }: {
   children?: React.ReactNode;
   type: AsideType;
   heading: React.ReactNode;
+  /**
+   * Don't render the (hidden) drawer contents during the first page load.
+   * They mount once the browser is idle after load, or as soon as the
+   * drawer opens, whichever comes first. The closed drawer is invisible, so
+   * nothing changes on screen; its JavaScript just stops competing with the
+   * first paint.
+   */
+  deferContent?: boolean;
 }) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
+  const [contentReady, setContentReady] = useState(!deferContent);
+
+  useEffect(() => {
+    if (contentReady) return;
+    if (expanded) {
+      setContentReady(true);
+      return;
+    }
+    return whenIdleAfterLoad(() => setContentReady(true));
+  }, [contentReady, expanded]);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -69,10 +88,30 @@ export function Aside({
             &times;
           </button>
         </header>
-        <main>{children}</main>
+        <main>{contentReady || expanded ? children : null}</main>
       </aside>
     </div>
   );
+}
+
+/** Runs `callback` once the page has loaded and the main thread is idle. */
+function whenIdleAfterLoad(callback: () => void) {
+  let idleId: number | undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const schedule = () => {
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(callback, {timeout: 3000});
+    } else {
+      timeoutId = setTimeout(callback, 1);
+    }
+  };
+  if (document.readyState === 'complete') schedule();
+  else window.addEventListener('load', schedule, {once: true});
+  return () => {
+    window.removeEventListener('load', schedule);
+    if (idleId !== undefined) window.cancelIdleCallback(idleId);
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+  };
 }
 
 const AsideContext = createContext<AsideContextValue | null>(null);
