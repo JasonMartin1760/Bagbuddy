@@ -98,7 +98,7 @@ export function BagBuyBox({
       <dialog
         ref={dialogRef}
         className="bb-bag-sheet"
-        aria-label={mode === 'checkout' ? 'Continue to checkout' : 'Add to cart'}
+        aria-label={mode === 'checkout' ? 'Checkout' : 'Add to cart'}
       >
         <div className="bb-bag-sheet__inner">
           <AddToCartButton
@@ -106,7 +106,9 @@ export function BagBuyBox({
             disabled={!available}
             lines={lines}
             redirectToCheckout={mode === 'checkout'}
-            pendingLabel={mode === 'checkout' ? 'Going to checkout…' : 'Adding…'}
+            pendingLabel={
+              mode === 'checkout' ? 'Going to checkout…' : 'Adding…'
+            }
             onClick={() => {
               if (mode === 'cart') {
                 dialogRef.current?.close();
@@ -114,7 +116,7 @@ export function BagBuyBox({
               }
             }}
           >
-            {mode === 'checkout' ? 'Continue to checkout' : 'Add to cart'}
+            {mode === 'checkout' ? 'Skip to checkout' : 'Skip and add to cart'}
           </AddToCartButton>
           <ZipChecker
             heading="Want to make sure we serve your area before buying a bag?"
