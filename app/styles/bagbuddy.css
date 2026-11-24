@@ -1982,54 +1982,103 @@ aside header h3 {
   max-width: none;
 }
 
-/* ---------- Bag purchase: "Before you continue" step ---------- */
-.bb-bag-step .bb-zip--small {
-  background: var(--bb-purple-tint);
-  border-radius: 12px;
-  margin: 0.5rem 0 0.9rem;
-  padding: 0.85rem 0.9rem 0.9rem;
-}
-
-.bb-bag-step .bb-zip__help {
+/* ---------- Bag purchase sheet (compact) ---------- */
+/* Pinned near the top of the screen so the iOS keyboard never covers it. */
+.bb-bag-sheet {
+  border: 0;
+  border-radius: var(--bb-radius);
+  box-shadow: 0 20px 60px rgb(20 10 50 / 0.35);
+  box-sizing: border-box;
   color: var(--bb-ink);
-  font-size: 0.85rem;
-  margin-top: 0.45rem;
-}
-
-.bb-bag-step__fees {
-  border-left: 4px solid #d9d1f0;
-  margin: 0 0 0.25rem;
-  padding: 0.1rem 0 0.1rem 0.85rem;
-}
-
-.bb-bag-step__fees h3 {
-  color: var(--bb-purple);
-  font-family: var(--bb-font-body);
-  font-size: 1rem;
-  font-weight: 800;
-  margin: 0 0 0.3rem;
-}
-
-.bb-bag-step__fees ul {
-  list-style: none;
-  margin: 0;
+  margin: 0.75rem auto auto;
+  max-width: 440px;
   padding: 0;
+  width: calc(100% - 1.5rem);
 }
 
-.bb-bag-step__fees li {
-  font-size: 0.95rem;
-  line-height: 1.5;
+@media (min-width: 48em) {
+  .bb-bag-sheet {
+    margin: auto;
+  }
 }
 
-.bb-bag-step__back {
+.bb-bag-sheet::backdrop {
+  background: rgb(24 14 60 / 0.6);
+}
+
+.bb-bag-sheet__inner {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem 1rem 0.5rem;
+}
+
+.bb-bag-sheet__inner form,
+.bb-bag-sheet__go {
+  width: 100%;
+}
+
+.bb-bag-sheet .bb-zip__label {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 0.4rem;
+}
+
+.bb-bag-sheet .bb-zip__form {
+  max-width: none;
+}
+
+.bb-bag-sheet .bb-zip__input {
+  border-color: #d9d1f0;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  min-height: 42px;
+  padding: 0.35rem 0.9rem;
+}
+
+.bb-bag-sheet .bb-zip__input:focus {
+  border-color: var(--bb-purple);
+}
+
+.bb-bag-sheet .bb-zip__submit {
+  font-size: 0.9rem;
+  min-height: 42px;
+  padding: 0.35rem 0.9rem;
+}
+
+.bb-zip__line {
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin: 0.4rem 0 0;
+}
+
+.bb-zip__line--ok {
+  color: #13774a;
+}
+
+.bb-zip__line--bad {
+  color: #b3261e;
+}
+
+.bb-bag-sheet__note {
+  color: #b3261e;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.bb-bag-sheet__close {
   background: none;
   border: 0;
   color: var(--bb-purple);
   cursor: pointer;
   font-family: var(--bb-font-body);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  min-height: 44px;
+  justify-self: center;
+  min-height: 40px;
   text-decoration: underline;
 }
 
@@ -2171,4 +2220,8 @@ aside header h3 {
 .bb-flex-line p {
   font-size: 1.02rem;
   margin: 0;
+}
+
+.bb-pdp .product-form .bb-bag-sheet button.bb-bag-sheet__go {
+  width: 100%;
 }
