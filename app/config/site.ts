@@ -97,6 +97,12 @@ export function phoneHref(phone: string): string {
   return `tel:${digits.length === 10 ? `+1${digits}` : `+${digits}`}`;
 }
 
+/** Turns a display phone number into an sms: href. */
+export function smsHref(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  return `sms:${digits.length === 10 ? `+1${digits}` : `+${digits}`}`;
+}
+
 /** Where the two main homepage buttons go. */
 export const BUY_BAG_PATH = '/products/dumpster-bag';
 export const BOOK_PICKUP_PATH = '/book-pickup';
