@@ -1255,3 +1255,55 @@ aside header h3 {
   font-size: 0.85rem;
   font-weight: 600;
 }
+
+/* Testimonials (homepage, in the trust bar's spot) */
+.bb-testimonials__title {
+  color: var(--bb-purple);
+  font-size: 1.5rem;
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.bb-testimonials__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 48em) {
+  .bb-testimonials__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.bb-testimonial {
+  background: #fff;
+  border: 1px solid #e6e0f5;
+  border-radius: var(--bb-radius);
+  border-top: 5px solid var(--bb-yellow);
+  box-shadow: var(--bb-shadow);
+  margin: 0;
+  padding: 1.25rem 1.35rem;
+}
+
+.bb-testimonial figure,
+.bb-testimonial blockquote {
+  margin: 0;
+}
+
+.bb-testimonial blockquote p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.bb-testimonial figcaption {
+  color: var(--bb-purple);
+  font-weight: 800;
+  margin-top: 0.75rem;
+}
+
+.bb-testimonials__note {
+  margin: 1rem 0 0;
+  text-align: center;
+}

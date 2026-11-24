@@ -13,6 +13,7 @@ import {
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
 import {BUY_BAG_PATH, SITE} from '~/config/site';
+import {TESTIMONIALS} from '~/config/testimonials';
 import {PRODUCT_PRICING, formatUsd} from '~/config/pricing';
 import {
   ALLOWED,
@@ -131,7 +132,9 @@ export default function Homepage() {
         </div>
       </section>
 
+      {/* Trust bar (PDF) renders once SITE.googleRating is set. */}
       <TrustBar />
+      <Testimonials />
 
       <section
         className="bb-section bb-section--purple"
@@ -223,6 +226,40 @@ function TrustBar() {
       ) : (
         <p>{content}</p>
       )}
+    </section>
+  );
+}
+
+/** Customer quotes, shown in the trust bar's spot on the homepage. */
+function Testimonials() {
+  if (TESTIMONIALS.items.length === 0) return null;
+  return (
+    <section
+      className="bb-section bb-testimonials"
+      aria-labelledby="testimonials-title"
+    >
+      <div className="bb-container">
+        <h2 id="testimonials-title" className="bb-testimonials__title">
+          What customers say
+        </h2>
+        <ul className="bb-testimonials__grid">
+          {TESTIMONIALS.items.map((item) => (
+            <li key={item.name} className="bb-testimonial">
+              <figure>
+                <blockquote>
+                  <p>&ldquo;{item.quote}&rdquo;</p>
+                </blockquote>
+                <figcaption>— {item.name}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+        {TESTIMONIALS.placeholder ? (
+          <p className="bb-muted bb-testimonials__note">
+            Sample reviews. Real customer reviews coming soon.
+          </p>
+        ) : null}
+      </div>
     </section>
   );
 }
