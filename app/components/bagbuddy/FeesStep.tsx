@@ -1,4 +1,4 @@
-import {useId, useRef, useState} from 'react';
+import {useId, useRef, useState, type ReactNode} from 'react';
 import type {OptimisticCartLineInput} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
@@ -41,6 +41,7 @@ export function FeesStepPurchase({
   subtext,
   stepLabel,
   note,
+  beforeStart,
   goTo = 'cart',
   startClassName = 'bb-btn bb-btn--yellow bb-btn--lg bb-buy__start',
 }: {
@@ -57,6 +58,8 @@ export function FeesStepPurchase({
   /** Small label above the heading, e.g. "Step 2 of 3" in the pickup flow. */
   stepLabel?: string;
   note?: string;
+  /** Optional content shown directly above the start button. Off by default. */
+  beforeStart?: ReactNode;
   goTo?: 'cart' | 'checkout';
   startClassName?: string;
 }) {
@@ -106,6 +109,7 @@ export function FeesStepPurchase({
 
   return (
     <div className="product-form bb-buy">
+      {beforeStart ?? null}
       <button
         type="button"
         className={startClassName}

@@ -109,10 +109,28 @@ export default function BookPickup() {
       firstRender.current = false;
       return;
     }
-    if (pickupHandle) {
+    if (!pickupHandle) return;
+    // Wait a frame so the zip result and Continue step have laid out.
+    const id = window.setTimeout(() => {
       areaRef.current?.scrollIntoView({behavior: 'smooth', block: 'nearest'});
-    }
+    }, 60);
+    return () => window.clearTimeout(id);
   }, [pickupHandle]);
+
+  const specificDayNote = (
+    <div className="bb-day-note">
+      <p className="bb-day-note__text">
+        Need a specific pickup day? Contact us before you order to make sure
+        we&rsquo;re available.
+      </p>
+      <ContactSheet
+        label="Contact"
+        buttonClassName="bb-btn bb-day-note__btn"
+        title="Ask about a specific pickup day"
+        emailSubject="Specific pickup day request"
+      />
+    </div>
+  );
 
   const zipForEmail = match?.zip ?? initialZip;
   const subject = encodeURIComponent('Pickup request');
@@ -175,15 +193,19 @@ export default function BookPickup() {
                     intro={PICKUP_FEES_INTRO}
                     subtext={PICKUP_FEES_SUBTEXT}
                     stepLabel="Step 2 of 3"
+                    beforeStart={specificDayNote}
                     note="Next: tell us about any extra-cost items in your bag, then check out."
                   />
                 ) : (
-                  <Link
-                    className="bb-btn bb-btn--yellow bb-btn--lg"
-                    to={`/products/${pickup.handle}`}
-                  >
-                    Book &amp; pay for pickup
-                  </Link>
+                  <>
+                    {specificDayNote}
+                    <Link
+                      className="bb-btn bb-btn--yellow bb-btn--lg"
+                      to={`/products/${pickup.handle}`}
+                    >
+                      Book &amp; pay for pickup
+                    </Link>
+                  </>
                 )}
               </div>
             ) : null}
@@ -210,9 +232,7 @@ export default function BookPickup() {
             <h2 id="specific-day-title" className="bb-specific-day__title">
               Need a specific day or time?
             </h2>
-            <p>
-              Just ask. We&rsquo;ll do our best to work with your schedule.
-            </p>
+            <p>Just ask. We&rsquo;ll do our best to work with your schedule.</p>
           </div>
           <ContactSheet
             label="Contact us"
