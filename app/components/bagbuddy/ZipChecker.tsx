@@ -35,23 +35,25 @@ export function ZipChecker({
   headingLevel = 'h1',
   initialZip = '',
   variant = 'default',
+  className = '',
 }: {
   heading: string;
   helpText?: string;
   /** Called after each check with the matched zip (served or coming soon), or null. */
   onAreaChange?: (match: ServiceZip | null) => void;
-  headingLevel?: 'h1' | 'h2';
+  headingLevel?: 'h1' | 'h2' | 'h3';
   initialZip?: string;
   /**
    * - `flow`: step 1 of the pickup flow. Checks as soon as 5 digits are typed,
    *   shows the exact area price and leaves the "continue" button to the page.
-   * - `compact`: small banner under the homepage map. Same results, with a
-   *   "Schedule Bag Pickup" button that carries the zip into the pickup flow.
+   * - `banner`: under the homepage map. Same results, with a "Schedule Bag
+   *   Pickup" button that carries the zip into the pickup flow.
    */
-  variant?: 'default' | 'flow' | 'compact';
+  variant?: 'default' | 'flow' | 'banner';
+  /** Extra class, e.g. `bb-zip--small` inside the bag purchase step. */
+  className?: string;
 }) {
   const inFlow = variant === 'flow';
-  const compact = variant === 'compact';
   const inputId = useId();
   const helpId = useId();
   const [zip, setZip] = useState(initialZip);
@@ -74,12 +76,12 @@ export function ZipChecker({
   }
 
   return (
-    <div className={compact ? 'bb-zip bb-zip--compact' : 'bb-zip'}>
+    <div className={`bb-zip bb-zip--${variant} ${className}`.trim()}>
       <Heading className="bb-zip__heading">{heading}</Heading>
       {variant === 'default' ? <PriceNote /> : null}
       <form className="bb-zip__form" onSubmit={handleSubmit} noValidate>
         <label htmlFor={inputId} className="visually-hidden">
-          Zip code
+          Enter your 5-digit zip code
         </label>
         <input
           id={inputId}
@@ -89,28 +91,25 @@ export function ZipChecker({
           autoComplete="postal-code"
           pattern="[0-9]{5}"
           maxLength={5}
-          placeholder="Zip code"
+          placeholder="5-digit zip code"
           aria-describedby={helpText ? helpId : undefined}
           aria-invalid={result.status === 'invalid'}
           value={zip}
           onChange={(event) => {
-            const value = event.target.value.replace(/\D/g, '').slice(0, 5);
+            const value = cleanZip(event.target.value);
             setZip(value);
-            if (inFlow && value.length === 5 && value !== zip) {
+            // Instant result once 5 digits are in.
+            if (value.length === 5 && value !== zip) {
               runCheck(value);
-              if (findServiceZip(value)) event.target.blur();
+              if (inFlow && findServiceZip(value)) event.target.blur();
             }
           }}
         />
         <button
           type="submit"
-          className={
-            compact
-              ? 'bb-btn bb-btn--outline-light bb-zip__submit'
-              : 'bb-btn bb-btn--yellow bb-zip__submit'
-          }
+          className="bb-btn bb-zip__submit"
         >
-          {compact ? 'Check' : 'Verify'}
+          Verify
         </button>
       </form>
       {helpText ? (
@@ -153,6 +152,14 @@ export function bookPickupHref(match: ServiceZip | null): string {
     : '/book-pickup';
 }
 
+/**
+ * Keeps only a 5-digit zip: drops anything after a dash (ZIP+4 autofill,
+ * e.g. "80903-1234") and any non-digits.
+ */
+function cleanZip(raw: string): string {
+  return raw.split('-')[0].replace(/\D/g, '').slice(0, 5);
+}
+
 function checkZip(raw: string): Result {
   const value = raw.trim();
   if (!value) return {status: 'idle'};
@@ -169,7 +176,7 @@ function ZipResult({
   variant,
 }: {
   result: Result;
-  variant: 'default' | 'flow' | 'compact';
+  variant: 'default' | 'flow' | 'banner';
 }) {
   const showContact = variant !== 'default';
   switch (result.status) {
@@ -235,9 +242,9 @@ function ZipResult({
               </>
             ) : null}
           </p>
-          {variant === 'compact' ? (
+          {variant === 'banner' ? (
             <Link
-              className="bb-btn bb-btn--outline-light bb-zip__book"
+              className="bb-btn bb-btn--purple bb-zip__book"
               to={bookPickupHref(match)}
             >
               Schedule Bag Pickup

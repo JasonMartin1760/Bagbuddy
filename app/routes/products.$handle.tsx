@@ -36,6 +36,7 @@ import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
 import {
   ALLOWED,
   PICKUP_FEES_INTRO,
+  PICKUP_FEES_SUBTEXT,
   getContentByKind,
   getProductContent,
   type ContentBlock,
@@ -198,7 +199,9 @@ function ShopifyProduct({
               startLabel="Schedule pickup"
               submitLabel="Continue to checkout"
               intro={PICKUP_FEES_INTRO}
-              note="Next: add any extra-cost items in your bag, then check out."
+              subtext={PICKUP_FEES_SUBTEXT}
+              stepLabel="Before checkout"
+              note="Next: tell us about any extra-cost items in your dumpster bag, then check out."
             />
           ) : (
             <ProductForm

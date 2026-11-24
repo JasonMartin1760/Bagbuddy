@@ -2,13 +2,13 @@
  * Homepage and product copy, taken from Jason's homepage spec (PDF).
  * Wording is kept as written; only obvious typos in customer-facing text
  * were fixed. Jason's call: the PDF's "Durabag" wording is now
- * "Bag Buddy" / "bag dumpster".
+ * "Bag Buddy" / "dumpster bag" (one term site-wide).
  */
 import type {ProductKind} from '~/config/pricing';
 import {PRODUCT_PRICING, findProductPricing, formatUsd} from '~/config/pricing';
 
 export const ALLOWED = {
-  title: "What's Allowed in Your Bag Dumpster",
+  title: "What's Allowed in Your Dumpster Bag",
   intro:
     "Most household and construction junk is welcome – here's what you need to know before you buy or fill your bag.",
   allowed: [
@@ -18,8 +18,7 @@ export const ALLOWED = {
     'Construction debris',
   ],
   notAllowed: [
-    'Hazardous waste (wet or liquid paint, chemicals, solvents, pesticides, household cleaners)',
-    'Any liquids or containers with free liquids',
+    'Hazardous waste such as paints, chemicals, solvents, pesticides, or household cleaners',
     'Used oil or automotive fluids',
     'Batteries (car batteries, lead-acid batteries, etc.)',
     'Tires',
@@ -33,7 +32,7 @@ export const ALLOWED = {
 export const PLACEMENT = {
   title: 'Where Can I Place My Bag Buddy Dumpster?',
   points: [
-    "You can place your bag dumpster almost anywhere on your property as long as it doesn't obstruct sidewalks or roadways.",
+    "You can place your dumpster bag almost anywhere on your property as long as it doesn't obstruct sidewalks or roadways.",
     'Our heavy-duty dually pickup trucks with cranes need roughly 9–10 feet of width (about the width of a standard driveway or parking spot).',
     'We can back into most driveways and reach about 8 feet off the back of the truck.',
     "There must be a clear, safe path for the truck and the surface must be strong enough to support the truck's weight.",
@@ -46,7 +45,7 @@ export const HOW_FULL = {
   points: [
     'You can fill the bag completely full as long as the handles reach together or can be tied together as well. This is required so our crane can hook onto the bag safely.',
     'For normal household junk and typical construction debris, you can fill it all the way up.',
-    "For heavy material such as dirt, rock, or concrete, do not exceed the bag's 3300 lb weight capacity — even if you can still tie the handles.",
+    "For heavy material such as dirt, rock, or concrete, do not exceed the bag's 3300 lb weight capacity — even if the handles still reach together.",
   ],
   capacityLbs: 3300,
 } as const;
@@ -60,11 +59,11 @@ export const HOW_IT_WORKS = [
   },
 ] as const;
 
-/** "Why choose a bag dumpster?" section (reworded from the PDF's comparison). */
-export const WHY_BAG_DUMPSTER = {
-  title: 'Why Choose a Bag Dumpster?',
+/** "Why choose a dumpster bag?" section (reworded from the PDF's comparison). */
+export const WHY_DUMPSTER_BAG = {
+  title: 'Why Choose a Dumpster Bag?',
   intro:
-    'A traditional metal dumpster comes with a rental window, a delivery appointment and sometimes a permit. A bag dumpster works around your schedule instead.',
+    'A traditional metal dumpster comes with a rental window, a delivery appointment and sometimes a permit. A dumpster bag works around your schedule instead.',
   points: [
     'Get it when you need it: buy a bag and start filling, with no rental clock running.',
     'Fill it at your own pace, whether that takes a weekend or a few weeks.',
@@ -79,13 +78,19 @@ export const ABOUT = {
   title: 'About Bag Buddy',
   paragraphs: [
     "I got into dumpster bags back when I was a contractor installing windows and doors. I used the bags myself twice a week, and I ended up building a crane to pick up my own. That's how Bag Buddy got started.",
-    "I'm just a local guy who owns the company. It's a very small operation: just me and one truck with a crane on it, and I love doing it. I love providing a service, and giving the best service I can to the people who need it, especially when a bag dumpster is the right fit for the job.",
+    "I'm just a local guy who owns the company. It's a very small operation: just me and one truck with a crane on it, and I love doing it. I love providing a service, and giving the best service I can to the people who need it, especially when a dumpster bag is the right fit for the job.",
   ],
+  /** Sign-off under the story. */
+  signature: 'Jason, owner of Bag Buddy',
 } as const;
 
 /** Intro on the pickup add-ons step. */
 export const PICKUP_FEES_INTRO =
-  "These charges apply at pickup. If any of these items are in the bag we're picking up, add one fee for each item now so it's included in your pickup checkout.";
+  "Add one fee for each item that's in your dumpster bag.";
+
+/** Subtext under "Extra item charges" (Jason's wording). */
+export const PICKUP_FEES_SUBTEXT =
+  'These additional disposal fees only apply if you are disposing of these items.';
 
 export type ContentBlock =
   | {type: 'list'; title: string; items: readonly string[]}
