@@ -58,7 +58,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     {
       name: 'description',
       content:
-        'Already have a filled dumpster bag, like the Bagster®? Book a crane-truck pickup in the Colorado Springs area. Picked up within 3 business days. Book your pickup online in minutes.',
+        'Already have a filled dumpster bag, like the Bagster®? Book a crane-truck pickup in the Colorado Springs area. Pickup in 1–3 business days, or a little longer in peak summer. Book your pickup online in minutes.',
     },
     {rel: 'canonical', href: data?.canonicalUrl ?? PAGE_PATH},
   ];
@@ -75,7 +75,7 @@ const STEPS = [
   },
   {
     title: 'We pick it up',
-    text: 'Our crane truck lifts the bag from your driveway or alley and hauls it away. Picked up within 3 business days.',
+    text: 'Our crane truck lifts the bag from your driveway or alley and hauls it away. Pickup in 1–3 business days, or a little longer in peak summer.',
   },
 ] as const;
 
@@ -156,7 +156,7 @@ export default function DumpsterBagPickupLanding() {
 
       <CtaBand
         title="Ready to book your pickup?"
-        text="Checkout takes a minute, and we pick up within 3 business days."
+        text="Checkout takes a minute. Pickup in 1–3 business days, or a little longer in peak summer."
       />
 
       <section
@@ -245,7 +245,7 @@ function CheckoutCard({
             {formatUsd(pricing.price)} <small>{pricing.unit}</small>
           </p>
         ) : null}
-        <p className="bb-landing__window">Picked up within 3 business days</p>
+        <p className="bb-landing__window">Pickup in 1–3 business days, or a little longer in peak summer.</p>
 
         {variantId ? (
           <FeesStepPurchase
