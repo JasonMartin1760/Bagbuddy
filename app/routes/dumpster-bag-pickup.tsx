@@ -1,6 +1,5 @@
 import {type MouseEvent} from 'react';
-import {useLoaderData, type FetcherWithComponents} from 'react-router';
-import {CartForm} from '@shopify/hydrogen';
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/dumpster-bag-pickup';
 import {
   AllowedLists,
@@ -14,6 +13,8 @@ import {
   type ProductPricing,
 } from '~/config/pricing';
 import {ALLOWED, HOW_FULL, PLACEMENT} from '~/data/content';
+import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
+import {loadFeeVariants, type FeeVariant} from '~/lib/feeVariants';
 
 const PAGE_PATH = '/dumpster-bag-pickup';
 const CHECKOUT_ID = 'checkout';
@@ -35,13 +36,19 @@ const PICKUP_VARIANT_QUERY = `#graphql
 
 export async function loader({context, request}: Route.LoaderArgs) {
   const canonicalUrl = new URL(PAGE_PATH, request.url).href;
-  const {product} = await context.storefront.query(PICKUP_VARIANT_QUERY, {
-    variables: {handle: PICKUP.handle},
-  });
+  const [{product}, feeVariants] = await Promise.all([
+    context.storefront.query(PICKUP_VARIANT_QUERY, {
+      variables: {handle: PICKUP.handle},
+    }),
+    loadFeeVariants(context.storefront),
+  ]);
+  const variant = product?.selectedOrFirstAvailableVariant;
 
   return {
     canonicalUrl,
-    variantId: product?.selectedOrFirstAvailableVariant?.id ?? null,
+    variantId: variant?.id ?? null,
+    variantAvailable: variant?.availableForSale ?? false,
+    feeVariants,
   };
 }
 
@@ -79,7 +86,8 @@ const STEPS = [
  * nav.
  */
 export default function DumpsterBagPickupLanding() {
-  const {variantId} = useLoaderData<typeof loader>();
+  const {variantId, variantAvailable, feeVariants} =
+    useLoaderData<typeof loader>();
 
   return (
     <div className="bb-page bb-landing">
@@ -91,8 +99,8 @@ export default function DumpsterBagPickupLanding() {
           <h1>Already have a filled dumpster bag? We&rsquo;ll pick it up.</h1>
           <p className="bb-lead">
             If you already have a filled dumpster bag, like the Bagster®, Bag
-            Buddy Dumpsters can pick it up in the Colorado Springs area (El
-            Paso County). Book your pickup online in minutes.
+            Buddy Dumpsters can pick it up in the Colorado Springs area (El Paso
+            County). Book your pickup online in minutes.
           </p>
           {PICKUP.price !== null ? (
             <p className="bb-landing__prices">
@@ -100,7 +108,12 @@ export default function DumpsterBagPickupLanding() {
             </p>
           ) : null}
 
-          <CheckoutCard pricing={PICKUP} variantId={variantId} />
+          <CheckoutCard
+            pricing={PICKUP}
+            variantId={variantId}
+            variantAvailable={variantAvailable}
+            feeVariants={feeVariants}
+          />
         </div>
       </section>
 
@@ -112,9 +125,9 @@ export default function DumpsterBagPickupLanding() {
           <p className="bb-section__intro">
             The pickup price covers crane-truck pickup of one filled dumpster
             bag in the Colorado Springs area. Our truck lifts the bag from your
-            driveway or alley and hauls it away. Additional fees apply for
-            large electronic devices and mattresses or box springs, listed
-            further down this page.
+            driveway or alley and hauls it away. Additional fees apply for large
+            electronic devices and mattresses or box springs, listed further
+            down this page.
           </p>
         </div>
       </section>
@@ -200,8 +213,8 @@ export default function DumpsterBagPickupLanding() {
 
       <p className="bb-landing__disclaimer">
         Bagster® is a registered trademark of Waste Management, Inc. Bag Buddy
-        Dumpsters is an independent company and is not affiliated with,
-        endorsed by, or sponsored by Waste Management.
+        Dumpsters is an independent company and is not affiliated with, endorsed
+        by, or sponsored by Waste Management.
       </p>
     </div>
   );
@@ -210,9 +223,13 @@ export default function DumpsterBagPickupLanding() {
 function CheckoutCard({
   pricing,
   variantId,
+  variantAvailable,
+  feeVariants,
 }: {
   pricing: ProductPricing;
   variantId: string | null;
+  variantAvailable: boolean;
+  feeVariants: FeeVariant[];
 }) {
   const priceLabel =
     pricing.price !== null ? ` — ${formatUsd(pricing.price)}` : '';
@@ -231,33 +248,20 @@ function CheckoutCard({
         <p className="bb-landing__window">Picked up within 3 business days</p>
 
         {variantId ? (
-          <CartForm
-            route="/cart"
-            action={CartForm.ACTIONS.LinesAdd}
-            inputs={{
-              lines: [{merchandiseId: variantId, quantity: 1}],
-            }}
-          >
-            {(fetcher: FetcherWithComponents<any>) => (
-              <>
-                <input type="hidden" name="redirectTo" value="checkout" />
-                <button
-                  className="bb-btn bb-btn--yellow bb-btn--lg"
-                  type="submit"
-                  disabled={fetcher.state !== 'idle'}
-                >
-                  {fetcher.state === 'idle'
-                    ? `Book pickup${priceLabel}`
-                    : 'Sending you to checkout…'}
-                </button>
-                <CartActionErrors fetcher={fetcher} />
-              </>
-            )}
-          </CartForm>
+          <FeesStepPurchase
+            mainVariant={{id: variantId, availableForSale: variantAvailable}}
+            feeVariants={feeVariants}
+            mainAttributeKey="Add-on items reviewed"
+            goTo="checkout"
+            startClassName="bb-btn bb-btn--yellow bb-btn--lg"
+            startLabel={`Book pickup${priceLabel}`}
+            submitLabel="Continue to checkout"
+            intro="Some items cost extra to dispose of. If any of these are in the bag we're picking up, add one fee for each item now."
+            note="Next: add any extra-cost items in your bag, then check out."
+          />
         ) : (
           <p className="bb-landing__fallback" role="status">
-            Online checkout isn&rsquo;t available right now.{' '}
-            <SpecificDayNote />
+            Online checkout isn&rsquo;t available right now. <SpecificDayNote />
           </p>
         )}
 
@@ -280,24 +284,6 @@ function SpecificDayNote() {
       Need a specific day? <a href={phoneHref(SITE.phone)}>Call</a> or{' '}
       <a href={smsHref(SITE.phone)}>text</a> and we&rsquo;ll set it up.
     </>
-  );
-}
-
-function CartActionErrors({
-  fetcher,
-}: {
-  fetcher: FetcherWithComponents<{errors?: {message?: string}[]}>;
-}) {
-  const errors = fetcher.data?.errors;
-  if (!errors?.length) return null;
-  return (
-    <p className="bb-landing__error" role="alert">
-      {errors
-        .map((error) => error.message)
-        .filter(Boolean)
-        .join(' ') ||
-        'We could not start checkout. Please call or text us to book.'}
-    </p>
   );
 }
 
@@ -336,6 +322,6 @@ function scrollToCheckout(event: MouseEvent<HTMLAnchorElement>) {
   event.preventDefault();
   section.scrollIntoView({behavior: 'smooth', block: 'start'});
   section
-    .querySelector<HTMLButtonElement>('button[type="submit"]')
+    .querySelector<HTMLButtonElement>('button')
     ?.focus({preventScroll: true});
 }
