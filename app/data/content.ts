@@ -5,7 +5,7 @@
  * "Bag Buddy" / "bag dumpster".
  */
 import type {ProductKind} from '~/config/pricing';
-import {findProductPricing} from '~/config/pricing';
+import {PRODUCT_PRICING, findProductPricing, formatUsd} from '~/config/pricing';
 
 export const ALLOWED = {
   title: "What's Allowed in Your Bag Dumpster",
@@ -82,6 +82,18 @@ export const ABOUT = {
     "I'm just a local guy who owns the company. It's a very small operation: just me and one truck with a crane on it, and I love doing it. I love providing a service, and giving the best service I can to the people who need it, especially when a bag dumpster is the right fit for the job.",
   ],
 } as const;
+
+const feeText = (kind: 'electronics-addon' | 'mattress-addon') => {
+  const price = PRODUCT_PRICING[kind].price;
+  return price !== null ? formatUsd(price) : '';
+};
+
+/** Shown on the bag page: extra item fees are charged at pickup only. */
+export const BAG_FEES_NOTE = `Extra item fees (${feeText('electronics-addon')} large electronics, ${feeText('mattress-addon')} mattress/box spring) are only charged when you schedule your pickup.`;
+
+/** Intro on the pickup add-ons step. */
+export const PICKUP_FEES_INTRO =
+  "These charges apply at pickup. If any of these items are in the bag we're picking up, add one fee for each item now so it's included in your pickup checkout.";
 
 export type ContentBlock =
   | {type: 'list'; title: string; items: readonly string[]}

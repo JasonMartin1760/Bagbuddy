@@ -1679,6 +1679,16 @@ aside header h3 {
   width: 22px;
 }
 
+.bb-fees-step__ack + .bb-fees-step__ack {
+  margin-top: 0.6rem;
+}
+
+.bb-fees-step__ack a {
+  color: var(--bb-purple);
+  font-weight: 800;
+  text-decoration: underline;
+}
+
 .bb-fees-step__actions {
   display: grid;
   gap: 0.6rem;
@@ -1708,4 +1718,138 @@ aside header h3 {
   color: var(--bb-red);
   font-weight: 700;
   margin: 0.5rem 0 0;
+}
+
+.bb-fees__when {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0.6rem 0 0;
+  opacity: 0.9;
+}
+
+.bb-bag-fees-note {
+  background: #fffbd6;
+  border-left: 6px solid var(--bb-yellow-dark);
+  border-radius: 10px;
+  color: var(--bb-purple-darker);
+  line-height: 1.45;
+  margin: 1rem 0 0;
+  padding: 0.75rem 0.9rem;
+}
+
+/* ---------- Bag buy box ---------- */
+.bb-buybox__qty-row {
+  align-items: center;
+  display: flex;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.bb-buybox__qty-label {
+  font-weight: 700;
+}
+
+.bb-qty--light {
+  background: var(--bb-purple-tint);
+  border: 1px solid #d9d2ee;
+}
+
+.bb-buybox__actions {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.bb-buybox__actions form,
+.bb-buybox__actions .bb-btn {
+  width: 100%;
+}
+
+.bb-pdp .product-form button[type='submit'].bb-buybox__add {
+  background: #fff;
+  border: 2px solid var(--bb-purple);
+  box-shadow: none;
+  color: var(--bb-purple);
+}
+
+.bb-pdp .product-form button[type='submit'].bb-buybox__add:disabled {
+  border-color: #ccc;
+  color: #888;
+}
+
+@media (min-width: 56em) {
+  .bb-buybox__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 560px;
+  }
+  .bb-pdp .product-form .bb-buybox__actions button[type='submit'] {
+    width: 100%;
+  }
+}
+
+/* ---------- Cart (drawer and page) ---------- */
+.cart-line-quantity {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.cart-line-quantity button {
+  background: var(--bb-purple-tint);
+  border: 1px solid #d9d2ee;
+  border-radius: 999px;
+  color: var(--bb-purple-darker);
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.cart-line-quantity button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.cart-line-qty {
+  font-weight: 800;
+  min-width: 1.4rem;
+  text-align: center;
+}
+
+.cart-line-quantity .cart-line-remove {
+  margin-left: 0.4rem;
+  background: none;
+  border: 0;
+  color: var(--bb-muted);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.bb-cart-checkout {
+  margin-top: 0.75rem;
+}
+
+.bb-cart-checkout .bb-btn {
+  width: 100%;
+}
+
+/* Full-width buttons in the buy box, add-ons step and cart need
+   border-box so padding doesn't push them past their container. */
+.bb-buybox .bb-btn,
+.bb-fees-step .bb-btn,
+.bb-cart-checkout .bb-btn,
+.bb-buy .bb-btn {
+  box-sizing: border-box;
+}
+
+.bb-fees-step .bb-fees-step__actions .bb-btn {
+  max-width: none;
+  width: 100%;
+}
+
+/* The template's reset caps forms at 400px on desktop. */
+.bb-fees-step__actions form,
+.bb-buybox__actions form {
+  max-width: none;
 }

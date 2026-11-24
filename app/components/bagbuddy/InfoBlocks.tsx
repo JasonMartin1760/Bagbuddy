@@ -30,7 +30,7 @@ export function AllowedLists({
           ))}
         </ul>
       </div>
-      <div className="bb-allowed__col bb-allowed__col--no">
+      <div className="bb-allowed__col bb-allowed__col--no" id="not-allowed">
         <Heading>Not Allowed</Heading>
         <ul>
           {ALLOWED.notAllowed.map((item) => (
@@ -70,6 +70,7 @@ export function FeeList({headingLevel = 'h3'}: {headingLevel?: 'h2' | 'h3'}) {
           </li>
         ))}
       </ul>
+      <p className="bb-fees__when">Charged when you schedule your pickup.</p>
     </section>
   );
 }

@@ -7,7 +7,7 @@ import {BulletList, FeeList} from '~/components/bagbuddy/InfoBlocks';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
 import {loadFeeVariants} from '~/lib/feeVariants';
 import {BUY_BAG_PATH, SITE} from '~/config/site';
-import {HOW_FULL, PLACEMENT} from '~/data/content';
+import {HOW_FULL, PICKUP_FEES_INTRO, PLACEMENT} from '~/data/content';
 import {
   SERVICE_AREAS,
   findServiceZip,
@@ -137,10 +137,11 @@ export default function BookPickup() {
                     mainVariant={pickupVariant}
                     feeVariants={feeVariants}
                     mainAttributeKey="Add-on items reviewed"
-                    startLabel="Add pickup to cart"
-                    submitLabel="Add pickup to cart"
-                    intro="Some items cost extra to dispose of. If any of these are in the bag we're picking up, add one fee for each item now."
-                    note="Next: add any extra-cost items in your bag before checkout."
+                    goTo="checkout"
+                    startLabel="Schedule pickup"
+                    submitLabel="Continue to checkout"
+                    intro={PICKUP_FEES_INTRO}
+                    note="Next: add any extra-cost items in your bag, then check out."
                   />
                 ) : (
                   <Link

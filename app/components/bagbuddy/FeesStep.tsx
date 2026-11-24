@@ -14,14 +14,17 @@ type MainVariant = {
 };
 
 const MAX_PER_FEE = 10;
+const NOT_ALLOWED_ID = 'not-allowed';
+const NOT_ALLOWED_HREF = `/#${NOT_ALLOWED_ID}`;
 
 /**
- * Required add-ons step for buying a bag or scheduling a pickup. The main
- * button opens a step that lists the additional item charges (large
+ * Required add-ons step for scheduling a pickup. The main button opens a
+ * step that lists the extra item charges that apply at pickup (large
  * electronic devices, mattresses / box springs) with quantities. The
- * shopper must tick "I understand" before anything goes into the cart, so
- * the step can't be skipped. The chosen fees are added to the cart as real
- * line items together with the bag or pickup.
+ * shopper must tick "I understand" and confirm the bag has no hazardous
+ * materials before anything goes into the cart, so the step can't be
+ * skipped. The chosen fees are added to the cart as real line items with
+ * the pickup, and the pickup line records both confirmations.
  *
  * - `goTo="cart"`: adds the lines and opens the cart drawer.
  * - `goTo="checkout"`: adds the lines and sends the shopper straight to
@@ -54,14 +57,18 @@ export function FeesStepPurchase({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const ackId = useId();
+  const hazardId = useId();
   const {open} = useAside();
   const [acknowledged, setAcknowledged] = useState(false);
+  const [noHazards, setNoHazards] = useState(false);
+  const ready = acknowledged && noHazards;
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const available = !!mainVariant?.availableForSale;
 
   function openStep() {
     setAcknowledged(false);
+    setNoHazards(false);
     dialogRef.current?.showModal();
   }
 
@@ -80,7 +87,10 @@ export function FeesStepPurchase({
           ...(mainVariant.selectedVariant
             ? {selectedVariant: mainVariant.selectedVariant}
             : {}),
-          attributes: [{key: mainAttributeKey, value: 'Yes'}],
+          attributes: [
+            {key: mainAttributeKey, value: 'Yes'},
+            {key: 'No hazardous materials confirmed', value: 'Yes'},
+          ],
         },
         ...feeVariants
           .filter((fee) => (quantities[fee.id] ?? 0) > 0)
@@ -107,12 +117,15 @@ export function FeesStepPurchase({
         ref={dialogRef}
         className="bb-fees-step"
         aria-labelledby={titleId}
-        onClose={() => setAcknowledged(false)}
+        onClose={() => {
+          setAcknowledged(false);
+          setNoHazards(false);
+        }}
       >
         <div className="bb-fees-step__inner">
           <p className="bb-fees-step__eyebrow">Step 2 of 2</p>
           <h2 id={titleId} className="bb-fees-step__title">
-            Additional item charges
+            Extra item charges at pickup
           </h2>
           <p>{intro}</p>
           <ul className="bb-fees-step__list">
@@ -166,13 +179,38 @@ export function FeesStepPurchase({
             />
             <span>
               I understand that large electronic devices and mattresses or box
-              springs in my bag cost extra, one fee per item.
+              springs in my bag are charged at pickup, one fee per item.
+            </span>
+          </label>
+          <label className="bb-fees-step__ack" htmlFor={hazardId}>
+            <input
+              id={hazardId}
+              type="checkbox"
+              checked={noHazards}
+              onChange={(event) => setNoHazards(event.target.checked)}
+            />
+            <span>
+              I confirm my bag contains no hazardous materials (
+              <a
+                href={NOT_ALLOWED_HREF}
+                onClick={(event) => {
+                  // Same page: close the step and scroll to the list.
+                  const target = document.getElementById(NOT_ALLOWED_ID);
+                  if (!target) return;
+                  event.preventDefault();
+                  dialogRef.current?.close();
+                  target.scrollIntoView({behavior: 'smooth', block: 'start'});
+                }}
+              >
+                see what&rsquo;s not allowed
+              </a>
+              ).
             </span>
           </label>
           <div className="bb-fees-step__actions">
             <AddToCartButton
               className="bb-btn bb-btn--yellow bb-btn--lg"
-              disabled={!acknowledged || !available}
+              disabled={!ready || !available}
               lines={lines}
               redirectToCheckout={goTo === 'checkout'}
               pendingLabel={
@@ -196,9 +234,9 @@ export function FeesStepPurchase({
               Go back
             </button>
           </div>
-          {!acknowledged ? (
+          {!ready ? (
             <p className="bb-fees-step__hint">
-              Tick the box above to continue.
+              Tick both boxes above to continue.
             </p>
           ) : null}
         </div>
