@@ -2,7 +2,10 @@ import {useId} from 'react';
 import {ADDITIONAL_FEES, formatUsd} from '~/config/pricing';
 import {ALLOWED} from '~/data/content';
 
-/** Two-column Allowed / Not Allowed lists from the homepage spec. */
+/**
+ * Allowed (green), Allowed with conditions (yellow) and Not Allowed (red)
+ * lists.
+ */
 export function AllowedLists({
   headingLevel = 'h3',
 }: {
@@ -15,6 +18,14 @@ export function AllowedLists({
         <Heading>Allowed</Heading>
         <ul>
           {ALLOWED.allowed.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="bb-allowed__col bb-allowed__col--maybe">
+        <Heading>Allowed with conditions</Heading>
+        <ul>
+          {ALLOWED.conditional.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>

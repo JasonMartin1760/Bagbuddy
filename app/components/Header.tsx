@@ -52,8 +52,8 @@ export function Header({cart}: HeaderProps) {
 }
 
 /**
- * Site navigation from app/config/site.ts (Buy Bags, Book a Pickup,
- * Services that we offer, About, Contact).
+ * Site navigation from app/config/site.ts (Buy Bags, Book a Pickup, the
+ * allowed / placement / why-a-bag-dumpster questions, About, Contact).
  */
 export function HeaderMenu({viewport}: {viewport: Viewport}) {
   const {close} = useAside();
@@ -67,28 +67,29 @@ export function HeaderMenu({viewport}: {viewport: Viewport}) {
           Home
         </NavLink>
       )}
-      {NAV_ITEMS.map((item) =>
-        item.to.includes('#') ? (
-          <Link
-            className="bb-nav__item"
-            key={item.to}
-            onClick={close}
-            to={item.to}
-          >
-            {item.label}
-          </Link>
-        ) : (
-          <NavLink
-            className="bb-nav__item"
-            end
-            key={item.to}
-            onClick={close}
-            prefetch="intent"
-            to={item.to}
-          >
-            {item.label}
-          </NavLink>
-        ),
+      {NAV_ITEMS.filter((item) => viewport === 'mobile' || !item.menuOnly).map(
+        (item) =>
+          item.to.includes('#') ? (
+            <Link
+              className="bb-nav__item"
+              key={item.to}
+              onClick={close}
+              to={item.to}
+            >
+              {item.label}
+            </Link>
+          ) : (
+            <NavLink
+              className="bb-nav__item"
+              end
+              key={item.to}
+              onClick={close}
+              prefetch="intent"
+              to={item.to}
+            >
+              {item.label}
+            </NavLink>
+          ),
       )}
       {viewport === 'mobile' && <CallButton className="bb-nav__call" />}
     </nav>

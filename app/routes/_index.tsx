@@ -16,11 +16,12 @@ import {BUY_BAG_PATH, SITE} from '~/config/site';
 import {TESTIMONIALS} from '~/config/testimonials';
 import {PRODUCT_PRICING, formatUsd} from '~/config/pricing';
 import {
+  ABOUT,
   ALLOWED,
   HOW_FULL,
   HOW_IT_WORKS,
   PLACEMENT,
-  WHY_DURABAG,
+  WHY_BAG_DUMPSTER,
 } from '~/data/content';
 import type {ServiceZip} from '~/data/serviceAreas';
 
@@ -85,7 +86,7 @@ export default function Homepage() {
               className="bb-btn bb-btn--outline-light bb-btn--lg"
               to={bookHref}
             >
-              Book Pickup Service
+              Schedule Bag Pickup
             </Link>
           </div>
           <div className="bb-hero__map">
@@ -93,48 +94,6 @@ export default function Homepage() {
           </div>
         </div>
       </section>
-
-      <section
-        className="bb-section"
-        id="services"
-        aria-labelledby="allowed-title"
-      >
-        <div className="bb-container">
-          <h2 id="allowed-title" className="bb-section__title">
-            {ALLOWED.title}
-          </h2>
-          <p className="bb-section__intro">{ALLOWED.intro}</p>
-          <AllowedLists />
-        </div>
-      </section>
-
-      <section
-        className="bb-section bb-section--tint"
-        aria-labelledby="place-title"
-      >
-        <div className="bb-container">
-          <h2 id="place-title" className="bb-section__title">
-            {PLACEMENT.title}
-          </h2>
-          <BulletList items={PLACEMENT.points} />
-        </div>
-      </section>
-
-      <section className="bb-section" aria-labelledby="full-title">
-        <div className="bb-container bb-split">
-          <div>
-            <h2 id="full-title" className="bb-section__title">
-              {HOW_FULL.title}
-            </h2>
-            <BulletList items={HOW_FULL.points} />
-          </div>
-          <FeeList />
-        </div>
-      </section>
-
-      {/* Trust bar (PDF) renders once SITE.googleRating is set. */}
-      <TrustBar />
-      <Testimonials />
 
       <section
         className="bb-section bb-section--purple"
@@ -164,7 +123,7 @@ export default function Homepage() {
                 ) : null}
                 {index === 2 ? (
                   <Link className="bb-step__link" to={bookHref}>
-                    Book pickup →
+                    Schedule bag pickup →
                   </Link>
                 ) : null}
               </li>
@@ -173,12 +132,73 @@ export default function Homepage() {
         </div>
       </section>
 
-      <section className="bb-section" id="about" aria-labelledby="why-title">
+      <section
+        className="bb-section"
+        id="allowed"
+        aria-labelledby="allowed-title"
+      >
+        <div className="bb-container">
+          <h2 id="allowed-title" className="bb-section__title">
+            {ALLOWED.title}
+          </h2>
+          <p className="bb-section__intro">{ALLOWED.intro}</p>
+          <AllowedLists />
+        </div>
+      </section>
+
+      <section
+        className="bb-section bb-section--tint"
+        id="placement"
+        aria-labelledby="place-title"
+      >
+        <div className="bb-container">
+          <h2 id="place-title" className="bb-section__title">
+            {PLACEMENT.title}
+          </h2>
+          <BulletList items={PLACEMENT.points} />
+        </div>
+      </section>
+
+      <section className="bb-section" aria-labelledby="full-title">
+        <div className="bb-container bb-split">
+          <div>
+            <h2 id="full-title" className="bb-section__title">
+              {HOW_FULL.title}
+            </h2>
+            <BulletList items={HOW_FULL.points} />
+          </div>
+          <FeeList />
+        </div>
+      </section>
+
+      <section
+        className="bb-section bb-section--tint"
+        id="why-bag-dumpster"
+        aria-labelledby="why-title"
+      >
         <div className="bb-container bb-narrow">
           <h2 id="why-title" className="bb-section__title">
-            {WHY_DURABAG.title}
+            {WHY_BAG_DUMPSTER.title}
           </h2>
-          <p className="bb-lead">{WHY_DURABAG.body}</p>
+          <p className="bb-section__intro">{WHY_BAG_DUMPSTER.intro}</p>
+          <BulletList items={WHY_BAG_DUMPSTER.points} />
+        </div>
+      </section>
+
+      {/* Trust bar (PDF) renders once SITE.googleRating is set. */}
+      <TrustBar />
+      <Testimonials />
+
+      <section className="bb-section" id="about" aria-labelledby="about-title">
+        <div className="bb-container bb-narrow">
+          <h2 id="about-title" className="bb-section__title">
+            {ABOUT.title}
+          </h2>
+          {ABOUT.paragraphs.map((paragraph) => (
+            <p key={paragraph} className="bb-lead bb-about__text">
+              {paragraph}
+            </p>
+          ))}
           <div className="bb-cta-row">
             <Link
               className="bb-btn bb-btn--purple bb-btn--lg"
@@ -187,7 +207,7 @@ export default function Homepage() {
               Buy a Dumpster Bag Now
             </Link>
             <Link className="bb-btn bb-btn--outline bb-btn--lg" to={bookHref}>
-              Book Pickup Service
+              Schedule Bag Pickup
             </Link>
           </div>
         </div>

@@ -16,6 +16,10 @@ import type {ProductFragment} from 'storefrontapi.generated';
 import {ProductPlaceholderImage} from '~/components/ProductItem';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
 import {
+  BagPurchaseForm,
+  type FeeVariant,
+} from '~/components/bagbuddy/BagPurchase';
+import {
   AllowedLists,
   BulletList,
   FeeList,
@@ -93,10 +97,50 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
+  // The bag's required fees step needs the fee products' variants.
+  const feeVariants =
+    findProductPricing(product)?.kind === 'dumpster-bag'
+      ? await loadFeeVariants(storefront)
+      : [];
+
   return {
     product,
     planned: null,
+    feeVariants,
   };
+}
+
+async function loadFeeVariants(
+  storefront: Route.LoaderArgs['context']['storefront'],
+): Promise<FeeVariant[]> {
+  const electronics = PRODUCT_PRICING['electronics-addon'];
+  const mattress = PRODUCT_PRICING['mattress-addon'];
+  try {
+    const data = await storefront.query(FEE_VARIANTS_QUERY, {
+      variables: {electronics: electronics.handle, mattress: mattress.handle},
+    });
+    const result: FeeVariant[] = [];
+    const e = data.electronics?.selectedOrFirstAvailableVariant;
+    if (e) {
+      result.push({
+        kind: electronics.kind,
+        id: e.id,
+        availableForSale: e.availableForSale,
+      });
+    }
+    const m = data.mattress?.selectedOrFirstAvailableVariant;
+    if (m) {
+      result.push({
+        kind: mattress.kind,
+        id: m.id,
+        availableForSale: m.availableForSale,
+      });
+    }
+    return result;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 }
 
 /**
@@ -113,10 +157,18 @@ export default function Product() {
   if (!data.product) {
     return <PlannedProduct pricing={data.planned} />;
   }
-  return <ShopifyProduct product={data.product} />;
+  return (
+    <ShopifyProduct product={data.product} feeVariants={data.feeVariants} />
+  );
 }
 
-function ShopifyProduct({product}: {product: ProductFragment}) {
+function ShopifyProduct({
+  product,
+  feeVariants,
+}: {
+  product: ProductFragment;
+  feeVariants: FeeVariant[];
+}) {
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -167,10 +219,17 @@ function ShopifyProduct({product}: {product: ProductFragment}) {
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <ProductForm
-            productOptions={productOptions}
-            selectedVariant={selectedVariant}
-          />
+          {pricing?.kind === 'dumpster-bag' ? (
+            <BagPurchaseForm
+              bagVariant={selectedVariant}
+              feeVariants={feeVariants}
+            />
+          ) : (
+            <ProductForm
+              productOptions={productOptions}
+              selectedVariant={selectedVariant}
+            />
+          )}
           <ProductCrossLinks kind={pricing?.kind} />
           {descriptionHtml ? (
             <div
@@ -394,6 +453,28 @@ const PRODUCT_FRAGMENT = `#graphql
     }
   }
   ${PRODUCT_VARIANT_FRAGMENT}
+` as const;
+
+const FEE_VARIANTS_QUERY = `#graphql
+  query BagFeeVariants(
+    $country: CountryCode
+    $language: LanguageCode
+    $electronics: String!
+    $mattress: String!
+  ) @inContext(country: $country, language: $language) {
+    electronics: product(handle: $electronics) {
+      selectedOrFirstAvailableVariant {
+        id
+        availableForSale
+      }
+    }
+    mattress: product(handle: $mattress) {
+      selectedOrFirstAvailableVariant {
+        id
+        availableForSale
+      }
+    }
+  }
 ` as const;
 
 const PRODUCT_QUERY = `#graphql

@@ -1,14 +1,14 @@
 /**
  * Homepage and product copy, taken from Jason's homepage spec (PDF).
  * Wording is kept as written; only obvious typos in customer-facing text
- * were fixed. "Durabag" is kept where the PDF uses it.
- * TODO(Jason): confirm "Durabag" vs "Bag Buddy" wording.
+ * were fixed. Jason's call: the PDF's "Durabag" wording is now
+ * "Bag Buddy" / "bag dumpster".
  */
 import type {ProductKind} from '~/config/pricing';
 import {findProductPricing} from '~/config/pricing';
 
 export const ALLOWED = {
-  title: "What's Allowed in Your Durabag Dumpster",
+  title: "What's Allowed in Your Bag Dumpster",
   intro:
     "Most household and construction junk is welcome – here's what you need to know before you buy or fill your bag.",
   allowed: [
@@ -18,19 +18,22 @@ export const ALLOWED = {
     'Construction debris',
   ],
   notAllowed: [
-    'Hazardous waste (paint, chemicals, solvents, pesticides, household cleaners). Empty cans with the lid off, such as paint cans, are fine.',
+    'Hazardous waste (wet or liquid paint, chemicals, solvents, pesticides, household cleaners)',
     'Any liquids or containers with free liquids',
     'Used oil or automotive fluids',
     'Batteries (car batteries, lead-acid batteries, etc.)',
     'Tires',
     'Infectious or medical waste',
   ],
+  conditional: [
+    'Paint cans: only if the paint is completely dried out and the lid is removed.',
+  ],
 } as const;
 
 export const PLACEMENT = {
   title: 'Where Can I Place My Bag Buddy Dumpster?',
   points: [
-    "You can place your Durabag almost anywhere on your property as long as it doesn't obstruct sidewalks or roadways.",
+    "You can place your bag dumpster almost anywhere on your property as long as it doesn't obstruct sidewalks or roadways.",
     'Our heavy-duty dually pickup trucks with cranes need roughly 9–10 feet of width (about the width of a standard driveway or parking spot).',
     'We can back into most driveways and reach about 8 feet off the back of the truck.',
     "There must be a clear, safe path for the truck and the surface must be strong enough to support the truck's weight.",
@@ -57,9 +60,27 @@ export const HOW_IT_WORKS = [
   },
 ] as const;
 
-export const WHY_DURABAG = {
-  title: 'Why Choose a Durabag Instead of a Traditional Dumpster?',
-  body: "Traditional metal dumpsters lock you into strict schedules, possible permit headaches, and deadlines. A Durabag is different. You get it exactly when you need it, where you need it, place it anywhere our full-size pickups can back up to, and fill it on your own time — perfect for moving, small renovations, or weekend projects. It's flexible junk removal that works around your life instead of forcing you to work around it.",
+/** "Why choose a bag dumpster?" section (reworded from the PDF's comparison). */
+export const WHY_BAG_DUMPSTER = {
+  title: 'Why Choose a Bag Dumpster?',
+  intro:
+    'A traditional metal dumpster comes with a rental window, a delivery appointment and sometimes a permit. A bag dumpster works around your schedule instead.',
+  points: [
+    'Get it when you need it: buy a bag and start filling, with no rental clock running.',
+    'Fill it at your own pace, whether that takes a weekend or a few weeks.',
+    'Place it almost anywhere our pickup trucks can back up to, including alleys.',
+    'Great for moving, small renovations, yard cleanups and weekend projects.',
+    "When it's full, schedule a pickup and our crane truck hauls it away.",
+  ],
+} as const;
+
+/** About section: Jason's story, in his words, tidied for the website. */
+export const ABOUT = {
+  title: 'About Bag Buddy',
+  paragraphs: [
+    "I got into dumpster bags back when I was a contractor installing windows and doors. I used the bags myself twice a week, and I ended up building a crane to pick up my own. That's how Bag Buddy got started.",
+    "I'm just a local guy who owns the company. It's a very small operation: just me and one truck with a crane on it, and I love doing it. I love providing a service, and giving the best service I can to the people who need it, especially when a bag dumpster is the right fit for the job.",
+  ],
 } as const;
 
 export type ContentBlock =

@@ -63,13 +63,21 @@ export const BOOK_PICKUP_PATH = '/book-pickup';
 export interface NavItem {
   label: string;
   to: string;
+  /** Only in the hamburger menu (too long for the desktop header row). */
+  menuOnly?: boolean;
 }
 
-/** Main navigation, in the order given in the homepage spec. */
+/** Main navigation (header and hamburger menu). */
 export const NAV_ITEMS: readonly NavItem[] = [
-  {label: 'Buy Bags', to: '/collections/all'},
-  {label: 'Book a Pickup', to: '/book-pickup'},
-  {label: 'Services that we offer', to: '/#services'},
+  {label: 'Buy Bags', to: BUY_BAG_PATH},
+  {label: 'Book a Pickup', to: BOOK_PICKUP_PATH},
+  {label: 'What’s allowed in the bag?', to: '/#allowed', menuOnly: true},
+  {label: 'Where can I place the bag?', to: '/#placement', menuOnly: true},
+  {
+    label: 'Why choose a bag dumpster?',
+    to: '/#why-bag-dumpster',
+    menuOnly: true,
+  },
   {label: 'About', to: '/#about'},
   {label: 'Contact', to: '/#contact'},
 ];

@@ -154,3 +154,11 @@ export function formatUsd(amount: number): string {
     minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
   }).format(amount);
 }
+
+/** Lowest pickup price across served areas (for "starting at" copy). */
+export const LOWEST_PICKUP_PRICE: number | null = (() => {
+  const prices = Object.values(PICKUP_STARTING_PRICE).filter(
+    (price): price is number => price !== null,
+  );
+  return prices.length ? Math.min(...prices) : null;
+})();
