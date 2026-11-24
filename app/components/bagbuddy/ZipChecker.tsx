@@ -13,6 +13,7 @@ import {
   formatUsd,
 } from '~/config/pricing';
 import {CallButton, TextButton} from '~/components/bagbuddy/ContactButton';
+import {SITE, phoneHref} from '~/config/site';
 
 type Result =
   | {status: 'idle'}
@@ -48,12 +49,15 @@ export function ZipChecker({
    *   shows the exact area price and leaves the "continue" button to the page.
    * - `banner`: under the homepage map. Same results, with a "Schedule Bag
    *   Pickup" button that carries the zip into the pickup flow.
+   * - `inline`: one-line optional check in the bag purchase sheet. The
+   *   heading is the input's visible label and the result is one short line.
    */
-  variant?: 'default' | 'flow' | 'banner';
+  variant?: 'default' | 'flow' | 'banner' | 'inline';
   /** Extra class, e.g. `bb-zip--small` inside the bag purchase step. */
   className?: string;
 }) {
   const inFlow = variant === 'flow';
+  const inline = variant === 'inline';
   const inputId = useId();
   const helpId = useId();
   const [zip, setZip] = useState(initialZip);
@@ -77,20 +81,28 @@ export function ZipChecker({
 
   return (
     <div className={`bb-zip bb-zip--${variant} ${className}`.trim()}>
-      <Heading className="bb-zip__heading">{heading}</Heading>
+      {inline ? null : (
+        <Heading className="bb-zip__heading">{heading}</Heading>
+      )}
       {variant === 'default' ? <PriceNote /> : null}
-      <form className="bb-zip__form" onSubmit={handleSubmit} noValidate>
-        <label htmlFor={inputId} className="visually-hidden">
-          Enter your 5-digit zip code
+      {inline ? (
+        <label htmlFor={inputId} className="bb-zip__label">
+          {heading}
         </label>
+      ) : null}
+      <form className="bb-zip__form" onSubmit={handleSubmit} noValidate>
+        {inline ? null : (
+          <label htmlFor={inputId} className="visually-hidden">
+            Enter your 5-digit zip code
+          </label>
+        )}
         <input
           id={inputId}
           className="bb-zip__input"
           type="text"
           inputMode="numeric"
           autoComplete="postal-code"
-          pattern="[0-9]{5}"
-          maxLength={5}
+          pattern="[0-9]*"
           placeholder="5-digit zip code"
           aria-describedby={helpText ? helpId : undefined}
           aria-invalid={result.status === 'invalid'}
@@ -118,7 +130,11 @@ export function ZipChecker({
         </p>
       ) : null}
       <div className="bb-zip__result" role="status" aria-live="polite">
-        <ZipResult result={result} variant={variant} />
+        {inline ? (
+          <InlineResult result={result} />
+        ) : (
+          <ZipResult result={result} variant={variant} />
+        )}
       </div>
     </div>
   );
@@ -153,11 +169,52 @@ export function bookPickupHref(match: ServiceZip | null): string {
 }
 
 /**
- * Keeps only a 5-digit zip: drops anything after a dash (ZIP+4 autofill,
- * e.g. "80903-1234") and any non-digits.
+ * Keeps only the 5-digit zip. Handles ZIP+4 from autofill or paste with or
+ * without the dash ("80922-2150", "80922 2150", "809222150") by taking the
+ * first 5 digits. The input has no maxLength on purpose: iOS autofill and
+ * paste would otherwise be cut off or blocked before reaching onChange.
  */
-function cleanZip(raw: string): string {
-  return raw.split('-')[0].replace(/\D/g, '').slice(0, 5);
+export function cleanZip(raw: string): string {
+  return raw.replace(/\D/g, '').slice(0, 5);
+}
+
+/** One short result line for the inline (bag sheet) check. */
+function InlineResult({result}: {result: Result}) {
+  const phone = SITE.phone;
+  const contact = phone ? (
+    <>
+      {' '}
+      Call or text <a href={phoneHref(phone)}>{phone}</a>.
+    </>
+  ) : null;
+  switch (result.status) {
+    case 'idle':
+      return null;
+    case 'invalid':
+      return (
+        <p className="bb-zip__line bb-zip__line--bad">
+          Please enter a 5-digit zip code.
+        </p>
+      );
+    case 'unserved':
+      return (
+        <p className="bb-zip__line bb-zip__line--bad">
+          Sorry, we don&rsquo;t serve this area yet.{contact}
+        </p>
+      );
+    case 'coming-soon':
+      return <p className="bb-zip__line">Coming soon to your area.{contact}</p>;
+    case 'served': {
+      const price = PICKUP_STARTING_PRICE[result.match.area];
+      const area = getServiceArea(result.match.area);
+      return (
+        <p className="bb-zip__line bb-zip__line--ok">
+          ✓ We serve the {area.label} area
+          {price !== null ? ` · pickup ${formatUsd(price)}` : ''}
+        </p>
+      );
+    }
+  }
 }
 
 function checkZip(raw: string): Result {
@@ -176,7 +233,7 @@ function ZipResult({
   variant,
 }: {
   result: Result;
-  variant: 'default' | 'flow' | 'banner';
+  variant: 'default' | 'flow' | 'banner' | 'inline';
 }) {
   const showContact = variant !== 'default';
   switch (result.status) {

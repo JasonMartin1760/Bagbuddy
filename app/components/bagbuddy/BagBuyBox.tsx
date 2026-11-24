@@ -1,18 +1,18 @@
-import {useId, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import type {OptimisticCartLineInput} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
-import {ADDITIONAL_FEES, formatUsd} from '~/config/pricing';
+import {formatUsd} from '~/config/pricing';
 import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
 
 const MAX_BAGS = 10;
 
 /**
  * Bag page buy box: quantity, "Buy now" and "Add to cart". Either button
- * opens a short "before you continue" step: an optional zip check (same
- * logic as the pickup flow) and a note about the extra disposal fees at
- * pickup. Nothing is required; the big yellow button goes straight on
- * (to Shopify checkout for Buy now, or into the cart for Add to cart).
+ * opens a small sheet: the big yellow button that goes straight on (Shopify
+ * checkout for Buy now, the cart for Add to cart), an optional one-line zip
+ * check (same logic as the pickup flow) and a short red note about extra
+ * disposal charges. Nothing is required.
  */
 export function BagBuyBox({
   variant,
@@ -31,7 +31,6 @@ export function BagBuyBox({
   const [quantity, setQuantity] = useState(1);
   const [mode, setMode] = useState<'checkout' | 'cart'>('checkout');
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
 
   function openStep(next: 'checkout' | 'cart') {
     setMode(next);
@@ -94,62 +93,44 @@ export function BagBuyBox({
         </button>
       </div>
 
+      {/* Compact sheet: the yellow button comes first so it's visible right
+          away (and above the iOS keyboard); the zip check is optional. */}
       <dialog
         ref={dialogRef}
-        className="bb-fees-step bb-bag-step"
-        aria-labelledby={titleId}
+        className="bb-bag-sheet"
+        aria-label={mode === 'checkout' ? 'Continue to checkout' : 'Add to cart'}
       >
-        <div className="bb-fees-step__inner">
-          <h2 id={titleId} className="bb-fees-step__title">
-            Before you continue
-          </h2>
-          <ZipChecker
-            heading="Make sure we serve your area"
-            headingLevel="h3"
-            helpText="Optional: enter your zip code to see your pickup price."
-            variant="flow"
-            className="bb-zip--small"
-          />
-          <div className="bb-bag-step__fees">
-            <h3>Some items have extra disposal fees at pickup</h3>
-            <ul>
-              {ADDITIONAL_FEES.map((fee) => (
-                <li key={fee.kind}>
-                  {fee.label}:{' '}
-                  <strong>
-                    {fee.price !== null ? formatUsd(fee.price) : '—'}
-                  </strong>{' '}
-                  each
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="bb-fees-step__actions">
-            <AddToCartButton
-              className="bb-btn bb-btn--yellow bb-btn--lg"
-              disabled={!available}
-              lines={lines}
-              redirectToCheckout={mode === 'checkout'}
-              pendingLabel={
-                mode === 'checkout' ? 'Going to checkout…' : 'Adding…'
+        <div className="bb-bag-sheet__inner">
+          <AddToCartButton
+            className="bb-btn bb-btn--yellow bb-btn--lg bb-bag-sheet__go"
+            disabled={!available}
+            lines={lines}
+            redirectToCheckout={mode === 'checkout'}
+            pendingLabel={mode === 'checkout' ? 'Going to checkout…' : 'Adding…'}
+            onClick={() => {
+              if (mode === 'cart') {
+                dialogRef.current?.close();
+                open('cart');
               }
-              onClick={() => {
-                if (mode === 'cart') {
-                  dialogRef.current?.close();
-                  open('cart');
-                }
-              }}
-            >
-              {mode === 'checkout' ? 'Continue to checkout' : 'Add to cart'}
-            </AddToCartButton>
-            <button
-              type="button"
-              className="bb-bag-step__back"
-              onClick={() => dialogRef.current?.close()}
-            >
-              Go back
-            </button>
-          </div>
+            }}
+          >
+            {mode === 'checkout' ? 'Continue to checkout' : 'Add to cart'}
+          </AddToCartButton>
+          <ZipChecker
+            heading="Want to make sure we serve your area before buying a bag?"
+            variant="inline"
+          />
+          <p className="bb-bag-sheet__note">
+            Some items have extra disposal charges, such as mattresses and large
+            electronics.
+          </p>
+          <button
+            type="button"
+            className="bb-bag-sheet__close"
+            onClick={() => dialogRef.current?.close()}
+          >
+            Go back
+          </button>
         </div>
       </dialog>
     </div>
