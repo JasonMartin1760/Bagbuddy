@@ -10,18 +10,21 @@ import {
 const MAP_AREAS = SERVICE_AREAS.filter((area) => area.status === 'served');
 
 /**
- * Lightweight inline-SVG map of Colorado with the Bag Buddy service areas.
- * No map library or API key. Hover, focus or tap an area to see its name;
- * the area matched by the zip checker is highlighted.
+ * Lightweight inline-SVG map of the Pikes Peak region with the Bag Buddy
+ * service areas. No map library or API key. Colorado Springs is the focus
+ * and fills the map; Woodland Park sits up in the corner as the side area.
+ * Hover, focus or tap an area to see its name; the area matched by the zip
+ * checker is highlighted.
  */
 
-// Colorado bounds (approx.) and a simple equirectangular projection.
-const WEST = -109.06;
-const EAST = -102.04;
-const NORTH = 41.0;
-const SOUTH = 36.99;
-const PX_PER_LON = 100;
-const PX_PER_LAT = PX_PER_LON / Math.cos((39 * Math.PI) / 180);
+// Map window (approx.), centred on Colorado Springs, with a simple
+// equirectangular projection. Woodland Park lands near the top-left edge.
+const WEST = -105.2;
+const EAST = -104.3;
+const NORTH = 39.12;
+const SOUTH = 38.6;
+const PX_PER_LON = 1000;
+const PX_PER_LAT = PX_PER_LON / Math.cos((38.86 * Math.PI) / 180);
 const PAD = 16;
 const WIDTH = (EAST - WEST) * PX_PER_LON;
 const HEIGHT = (NORTH - SOUTH) * PX_PER_LAT;
@@ -33,17 +36,36 @@ function project(lat: number, lon: number) {
   };
 }
 
-// Interstate 25 along the Front Range, for orientation.
+function toPath(points: Array<[number, number]>) {
+  return points
+    .map(([lat, lon], i) => {
+      const {x, y} = project(lat, lon);
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(' ');
+}
+
+// Interstate 25 through Colorado Springs, for orientation.
 const I25: Array<[number, number]> = [
-  [41.0, -104.88],
-  [40.58, -104.98],
-  [39.74, -104.99],
-  [39.37, -104.86],
+  [39.13, -104.87],
+  [39.02, -104.86],
+  [38.93, -104.81],
   [38.83, -104.82],
-  [38.25, -104.61],
-  [37.17, -104.5],
-  [36.99, -104.47],
+  [38.75, -104.77],
+  [38.59, -104.68],
 ];
+
+// US 24 from Colorado Springs up Ute Pass to Woodland Park.
+const US24: Array<[number, number]> = [
+  [38.84, -104.84],
+  [38.86, -104.91],
+  [38.91, -104.96],
+  [38.95, -105.01],
+  [38.99, -105.06],
+  [39.02, -105.21],
+];
+
+const PIKES_PEAK = {lat: 38.84, lon: -105.04};
 
 const CITY_DOTS: Array<{name: string; lat: number; lon: number}> = [
   {name: 'Colorado Springs', lat: 38.83, lon: -104.82},
@@ -59,17 +81,14 @@ export function ServiceMap({
   const activeId = hovered ?? highlightedArea ?? null;
   const active = MAP_AREAS.find((area) => area.id === activeId);
 
-  const i25Path = I25.map(([lat, lon], i) => {
-    const {x, y} = project(lat, lon);
-    return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
-  }).join(' ');
+  const peak = project(PIKES_PEAK.lat, PIKES_PEAK.lon);
 
   return (
     <figure className="bb-map">
       <svg
         viewBox={`0 0 ${WIDTH + PAD * 2} ${HEIGHT + PAD * 2}`}
         role="group"
-        aria-label="Map of Colorado showing Bag Buddy service areas: Colorado Springs and Woodland Park"
+        aria-label="Map of the Pikes Peak region showing Bag Buddy service areas: Colorado Springs, plus Woodland Park"
       >
         <rect
           className="bb-map__state"
@@ -77,24 +96,41 @@ export function ServiceMap({
           y={PAD}
           width={WIDTH}
           height={HEIGHT}
-          rx={6}
+          rx={10}
         />
         <text
           className="bb-map__state-label"
-          x={PAD + 24}
+          x={PAD + WIDTH - 24}
           y={PAD + HEIGHT - 24}
+          textAnchor="end"
           aria-hidden="true"
         >
-          COLORADO
+          PIKES PEAK REGION
         </text>
-        <path className="bb-map__road" d={i25Path} aria-hidden="true" />
+        <defs>
+          <clipPath id="bb-map-clip">
+            <rect x={PAD} y={PAD} width={WIDTH} height={HEIGHT} rx={10} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#bb-map-clip)" aria-hidden="true">
+          <path className="bb-map__road" d={toPath(I25)} />
+          <path className="bb-map__road bb-map__road--minor" d={toPath(US24)} />
+        </g>
         <text
           className="bb-map__road-label"
-          {...project(37.7, -104.42)}
+          {...project(39.08, -104.84)}
           aria-hidden="true"
         >
           I-25
         </text>
+        <g className="bb-map__peak" aria-hidden="true">
+          <path
+            d={`M${peak.x} ${peak.y - 22} L${peak.x + 22} ${peak.y + 16} L${peak.x - 22} ${peak.y + 16} Z`}
+          />
+          <text x={peak.x} y={peak.y + 46} textAnchor="middle">
+            Pikes Peak
+          </text>
+        </g>
         {MAP_AREAS.map((area) => (
           <AreaMarker
             key={area.id}
@@ -112,7 +148,7 @@ export function ServiceMap({
               className="bb-map__city"
               cx={x}
               cy={y}
-              r={3.5}
+              r={6}
               aria-hidden="true"
             />
           );
@@ -167,14 +203,16 @@ function AreaMarker({
   onActivate: (id: ServiceAreaId | null) => void;
 }) {
   const {x, y} = project(area.lat, area.lon);
+  // Woodland Park is the side area: smaller, label tucked above it.
+  const secondary = area.id === 'woodland-park';
   const className = [
     'bb-map__area',
     active ? 'is-active' : '',
     matched ? 'is-matched' : '',
+    secondary ? 'bb-map__area--side' : 'bb-map__area--main',
   ]
     .filter(Boolean)
     .join(' ');
-  const labelLeft = area.id === 'woodland-park';
   return (
     <g
       className={className}
@@ -196,9 +234,9 @@ function AreaMarker({
     >
       <circle cx={x} cy={y} r={area.radius} />
       <text
-        x={labelLeft ? x - area.radius - 6 : x + area.radius + 6}
-        y={y + 5}
-        textAnchor={labelLeft ? 'end' : 'start'}
+        x={secondary ? x - area.radius : x}
+        y={secondary ? y - area.radius - 14 : y + area.radius + 44}
+        textAnchor={secondary ? 'start' : 'middle'}
       >
         {area.label}
       </text>

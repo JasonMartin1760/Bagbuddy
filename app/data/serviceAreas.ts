@@ -1011,9 +1011,9 @@ export const SERVICE_AREAS: readonly ServiceArea[] = [
     label: 'Colorado Springs',
     status: 'served',
     counties: ['El Paso'],
-    lat: 38.85,
-    lon: -104.72,
-    radius: 22,
+    lat: 38.86,
+    lon: -104.78,
+    radius: 150,
   },
   {
     id: 'woodland-park',
@@ -1022,7 +1022,7 @@ export const SERVICE_AREAS: readonly ServiceArea[] = [
     counties: ['Teller'],
     lat: 38.99,
     lon: -105.06,
-    radius: 11,
+    radius: 34,
   },
 ];
 
