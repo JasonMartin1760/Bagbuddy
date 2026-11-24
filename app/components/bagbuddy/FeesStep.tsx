@@ -19,12 +19,12 @@ const NOT_ALLOWED_HREF = `/#${NOT_ALLOWED_ID}`;
 
 /**
  * Required add-ons step for scheduling a pickup. The main button opens a
- * step that lists the extra item charges that apply at pickup (large
- * electronic devices, mattresses / box springs) with quantities. The
- * shopper must tick "I understand" and confirm the bag has no hazardous
- * materials before anything goes into the cart, so the step can't be
- * skipped. The chosen fees are added to the cart as real line items with
- * the pickup, and the pickup line records both confirmations.
+ * step that lists the extra item charges (large electronic devices,
+ * mattresses / box springs) with quantities. The shopper must confirm their
+ * dumpster bag has no hazardous materials before anything goes into the
+ * cart. The chosen fees are added to the cart as real line items with the
+ * pickup, and the pickup line records "Add-on items reviewed: Yes" (they went
+ * through this step) and "No hazardous materials confirmed: Yes".
  *
  * - `goTo="cart"`: adds the lines and opens the cart drawer.
  * - `goTo="checkout"`: adds the lines and sends the shopper straight to
@@ -38,6 +38,8 @@ export function FeesStepPurchase({
   submitLabel,
   submittingLabel,
   intro,
+  subtext,
+  stepLabel,
   note,
   goTo = 'cart',
   startClassName = 'bb-btn bb-btn--yellow bb-btn--lg bb-buy__start',
@@ -50,24 +52,25 @@ export function FeesStepPurchase({
   submitLabel: string;
   submittingLabel?: string;
   intro: string;
+  /** Line under the heading. */
+  subtext?: string;
+  /** Small label above the heading, e.g. "Step 2 of 3" in the pickup flow. */
+  stepLabel?: string;
   note?: string;
   goTo?: 'cart' | 'checkout';
   startClassName?: string;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
-  const ackId = useId();
   const hazardId = useId();
   const {open} = useAside();
-  const [acknowledged, setAcknowledged] = useState(false);
   const [noHazards, setNoHazards] = useState(false);
-  const ready = acknowledged && noHazards;
+  const ready = noHazards;
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const available = !!mainVariant?.availableForSale;
 
   function openStep() {
-    setAcknowledged(false);
     setNoHazards(false);
     dialogRef.current?.showModal();
   }
@@ -117,16 +120,16 @@ export function FeesStepPurchase({
         ref={dialogRef}
         className="bb-fees-step"
         aria-labelledby={titleId}
-        onClose={() => {
-          setAcknowledged(false);
-          setNoHazards(false);
-        }}
+        onClose={() => setNoHazards(false)}
       >
         <div className="bb-fees-step__inner">
-          <p className="bb-fees-step__eyebrow">Step 2 of 3</p>
+          {stepLabel ? (
+            <p className="bb-fees-step__eyebrow">{stepLabel}</p>
+          ) : null}
           <h2 id={titleId} className="bb-fees-step__title">
-            Extra item charges at pickup
+            Extra item charges
           </h2>
+          {subtext ? <p className="bb-fees-step__sub">{subtext}</p> : null}
           <p>{intro}</p>
           <ul className="bb-fees-step__list">
             {ADDITIONAL_FEES.map((fee) => {
@@ -170,18 +173,6 @@ export function FeesStepPurchase({
               );
             })}
           </ul>
-          <label className="bb-fees-step__ack" htmlFor={ackId}>
-            <input
-              id={ackId}
-              type="checkbox"
-              checked={acknowledged}
-              onChange={(event) => setAcknowledged(event.target.checked)}
-            />
-            <span>
-              I understand that large electronic devices and mattresses or box
-              springs in my bag are charged at pickup, one fee per item.
-            </span>
-          </label>
           <label className="bb-fees-step__ack" htmlFor={hazardId}>
             <input
               id={hazardId}
@@ -190,7 +181,7 @@ export function FeesStepPurchase({
               onChange={(event) => setNoHazards(event.target.checked)}
             />
             <span>
-              I confirm my bag contains no hazardous materials (
+              My dumpster bag does not contain hazardous materials (
               <a
                 href={NOT_ALLOWED_HREF}
                 onClick={(event) => {
@@ -236,7 +227,7 @@ export function FeesStepPurchase({
           </div>
           {!ready ? (
             <p className="bb-fees-step__hint">
-              Tick both boxes above to continue.
+              Tick the box above to continue.
             </p>
           ) : null}
         </div>

@@ -22,7 +22,7 @@ import {
   HOW_FULL,
   HOW_IT_WORKS,
   PLACEMENT,
-  WHY_BAG_DUMPSTER,
+  WHY_DUMPSTER_BAG,
 } from '~/data/content';
 
 export const meta: Route.MetaFunction = () => {
@@ -72,7 +72,7 @@ export default function Homepage() {
         <div className="bb-hero__inner">
           <div className="bb-hero__intro">
             <h1 id="hero-title" className="bb-hero__title">
-              Fill a bag on your own time. We&rsquo;ll haul it away.
+              Dumpster bags. When you need it, where you need it.
             </h1>
             {LOWEST_PICKUP_PRICE !== null ? (
               <p className="bb-hero__price">
@@ -95,12 +95,16 @@ export default function Homepage() {
             </Link>
           </div>
           <div className="bb-hero__map">
-            <ServiceMap highlightedArea={matchedArea} />
-            <ZipChecker
-              heading="Check if we serve your zip code"
-              headingLevel="h2"
-              variant="compact"
-              onAreaChange={setMatch}
+            <ServiceMap
+              highlightedArea={matchedArea}
+              footer={
+                <ZipChecker
+                  heading="Check if we serve your zip code"
+                  headingLevel="h2"
+                  variant="banner"
+                  onAreaChange={setMatch}
+                />
+              }
             />
           </div>
         </div>
@@ -187,15 +191,15 @@ export default function Homepage() {
 
       <section
         className="bb-section bb-section--tint"
-        id="why-bag-dumpster"
+        id="why-dumpster-bag"
         aria-labelledby="why-title"
       >
         <div className="bb-container bb-narrow">
           <h2 id="why-title" className="bb-section__title">
-            {WHY_BAG_DUMPSTER.title}
+            {WHY_DUMPSTER_BAG.title}
           </h2>
-          <p className="bb-section__intro">{WHY_BAG_DUMPSTER.intro}</p>
-          <BulletList items={WHY_BAG_DUMPSTER.points} />
+          <p className="bb-section__intro">{WHY_DUMPSTER_BAG.intro}</p>
+          <BulletList items={WHY_DUMPSTER_BAG.points} />
         </div>
       </section>
 
@@ -215,6 +219,7 @@ export default function Homepage() {
               </p>
             ))}
           </div>
+          <AboutSignature />
           <TruckPhoto className="bb-about__photo" />
           <div className="bb-cta-row bb-about__cta">
             <Link
@@ -316,5 +321,34 @@ function TruckPhoto({className}: {className: string}) {
         decoding="async"
       />
     </picture>
+  );
+}
+
+/**
+ * Sign-off under Jason's story. Shows his photo beside it once
+ * SITE.ownerPhoto is set; until then it's just the name line (no empty box).
+ */
+function AboutSignature() {
+  const photo = SITE.ownerPhoto;
+  return (
+    <p className="bb-about__signature">
+      {photo ? (
+        <picture className="bb-about__avatar">
+          <source srcSet={photo.src} type="image/webp" />
+          <img
+            src={photo.fallbackSrc}
+            alt={photo.alt}
+            width={64}
+            height={64}
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      ) : null}
+      <span>
+        <span aria-hidden="true">— </span>
+        {ABOUT.signature}
+      </span>
+    </p>
   );
 }

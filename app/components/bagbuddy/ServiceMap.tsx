@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, type Dispatch, type ReactNode, type SetStateAction} from 'react';
 import {
   SERVICE_AREAS,
   type ServiceArea,
@@ -74,8 +74,11 @@ const CITY_DOTS: Array<{name: string; lat: number; lon: number}> = [
 
 export function ServiceMap({
   highlightedArea,
+  footer,
 }: {
   highlightedArea?: ServiceAreaId | null;
+  /** Replaces the caption and area buttons under the map (e.g. a zip checker). */
+  footer?: ReactNode;
 }) {
   const [hovered, setHovered] = useState<ServiceAreaId | null>(null);
   const activeId = hovered ?? highlightedArea ?? null;
@@ -154,6 +157,26 @@ export function ServiceMap({
           );
         })}
       </svg>
+      {footer ? (
+        <div className="bb-map__footer">{footer}</div>
+      ) : (
+        <MapCaption active={active} activeId={activeId} onToggle={setHovered} />
+      )}
+    </figure>
+  );
+}
+
+function MapCaption({
+  active,
+  activeId,
+  onToggle,
+}: {
+  active: ServiceArea | undefined;
+  activeId: ServiceAreaId | null;
+  onToggle: Dispatch<SetStateAction<ServiceAreaId | null>>;
+}) {
+  return (
+    <>
       <figcaption className="bb-map__caption" aria-live="polite">
         {active ? (
           <>
@@ -179,7 +202,7 @@ export function ServiceMap({
               }
               aria-pressed={area.id === activeId}
               onClick={() =>
-                setHovered((current) => (current === area.id ? null : area.id))
+                onToggle((current) => (current === area.id ? null : area.id))
               }
             >
               {area.label}
@@ -187,7 +210,7 @@ export function ServiceMap({
           </li>
         ))}
       </ul>
-    </figure>
+    </>
   );
 }
 

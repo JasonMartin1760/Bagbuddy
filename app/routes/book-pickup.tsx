@@ -1,13 +1,17 @@
 import {Link, useLoaderData, useSearchParams} from 'react-router';
 import type {Route} from './+types/book-pickup';
 import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
-import {ServiceMap} from '~/components/bagbuddy/ServiceMap';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
-import {BulletList, FeeList} from '~/components/bagbuddy/InfoBlocks';
+import {BulletList} from '~/components/bagbuddy/InfoBlocks';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
 import {loadFeeVariants} from '~/lib/feeVariants';
 import {BUY_BAG_PATH, SITE} from '~/config/site';
-import {HOW_FULL, PICKUP_FEES_INTRO, PLACEMENT} from '~/data/content';
+import {
+  HOW_FULL,
+  PICKUP_FEES_INTRO,
+  PICKUP_FEES_SUBTEXT,
+  PLACEMENT,
+} from '~/data/content';
 import {
   SERVICE_AREAS,
   findServiceZip,
@@ -128,7 +132,7 @@ export default function BookPickup() {
       </section>
 
       <section className="bb-section">
-        <div className="bb-container bb-split">
+        <div className="bb-container bb-book">
           <div className="bb-card">
             <ol className="bb-flow-steps" aria-label="Pickup steps">
               <li aria-current={pickup ? undefined : 'step'}>1. Zip code</li>
@@ -136,7 +140,7 @@ export default function BookPickup() {
               <li>3. Checkout</li>
             </ol>
             <ZipChecker
-              heading="Enter your zip code"
+              heading="Enter your 5-digit zip code"
               helpText="We'll show whether we serve your area and your exact pickup price."
               headingLevel="h2"
               initialZip={initialZip}
@@ -167,6 +171,8 @@ export default function BookPickup() {
                     startLabel="Continue"
                     submitLabel="Continue to checkout"
                     intro={PICKUP_FEES_INTRO}
+                    subtext={PICKUP_FEES_SUBTEXT}
+                    stepLabel="Step 2 of 3"
                     note="Next: tell us about any extra-cost items in your bag, then check out."
                   />
                 ) : (
@@ -193,12 +199,11 @@ export default function BookPickup() {
               <Link to={BUY_BAG_PATH}>Buy a dumpster bag</Link>.
             </p>
           </div>
-          <ServiceMap highlightedArea={served ? area : null} />
         </div>
       </section>
 
       <section className="bb-section bb-section--tint">
-        <div className="bb-container bb-split">
+        <div className="bb-container bb-book">
           <div>
             <h2 className="bb-section__title">Before we arrive</h2>
             <BulletList
@@ -209,7 +214,6 @@ export default function BookPickup() {
               ]}
             />
           </div>
-          <FeeList />
         </div>
       </section>
     </div>

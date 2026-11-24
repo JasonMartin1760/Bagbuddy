@@ -33,7 +33,7 @@ export const SITE = {
    * Hero background image (full-width, behind the zip checker).
    * TODO(Jason): PLACEHOLDER. This is the full-color Bag Buddy logo JPG
    * (upload b72e…jpg) until the real photo of the truck craning/lifting a
-   * bag dumpster arrives. To swap it, drop the photo in /public/images and
+   * dumpster bag arrives. To swap it, drop the photo in /public/images and
    * change these three lines. Set `src` to null to use the plain purple
    * gradient instead.
    */
@@ -62,6 +62,17 @@ export const SITE = {
    * Jason's own photo of the Bag Buddy truck craning a full bag (sky cropped,
    * resized to 1200px tall, metadata stripped). Used in About and How It Works.
    */
+  /**
+   * Optional photo of Jason for the About sign-off. Leave null until there's
+   * a photo; nothing is shown in its place. To add one, drop a square photo
+   * in /public/images (e.g. jason.webp + jason.jpg) and fill these in.
+   */
+  ownerPhoto: null as null | {
+    src: string;
+    fallbackSrc: string;
+    alt: string;
+  },
+
   truckImage: {
     src: '/images/bag-buddy-crane-truck.webp',
     fallbackSrc: '/images/bag-buddy-crane-truck.jpg',
@@ -95,8 +106,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
   {label: 'What’s allowed in the bag?', to: '/#allowed', menuOnly: true},
   {label: 'Where can I place the bag?', to: '/#placement', menuOnly: true},
   {
-    label: 'Why choose a bag dumpster?',
-    to: '/#why-bag-dumpster',
+    label: 'Why choose a dumpster bag?',
+    to: '/#why-dumpster-bag',
     menuOnly: true,
   },
   {label: 'About', to: '/#about'},

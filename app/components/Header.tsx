@@ -54,7 +54,7 @@ export function Header({cart}: HeaderProps) {
 
 /**
  * Site navigation from app/config/site.ts (Buy Bags, Book a Pickup, the
- * allowed / placement / why-a-bag-dumpster questions, About, Contact).
+ * allowed / placement / why-a-dumpster-bag questions, About, Contact).
  */
 export function HeaderMenu({viewport}: {viewport: Viewport}) {
   const {close} = useAside();
