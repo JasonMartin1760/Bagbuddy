@@ -7,7 +7,12 @@ import {
   type ServiceAreaId,
   type ServiceZip,
 } from '~/data/serviceAreas';
-import {PICKUP_STARTING_PRICE, formatUsd} from '~/config/pricing';
+import {
+  LOWEST_PICKUP_PRICE,
+  PICKUP_STARTING_PRICE,
+  PRODUCT_PRICING,
+  formatUsd,
+} from '~/config/pricing';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
 
 type Result =
@@ -58,6 +63,7 @@ export function ZipChecker({
   return (
     <div className="bb-zip">
       <Heading className="bb-zip__heading">{heading}</Heading>
+      <PriceNote />
       <form className="bb-zip__form" onSubmit={handleSubmit} noValidate>
         <label htmlFor={inputId} className="visually-hidden">
           Zip code
@@ -91,6 +97,29 @@ export function ZipChecker({
         <ZipResult result={result} />
       </div>
     </div>
+  );
+}
+
+/**
+ * Starting prices under the heading. Pickup is "starting at" the lowest
+ * area price (Colorado Springs $130; Woodland Park is $150).
+ */
+function PriceNote() {
+  const bag = PRODUCT_PRICING['dumpster-bag'].price;
+  if (LOWEST_PICKUP_PRICE === null && bag === null) return null;
+  return (
+    <p className="bb-zip__prices">
+      {LOWEST_PICKUP_PRICE !== null ? (
+        <span className="bb-zip__price-pill">
+          Pickup starting at <strong>{formatUsd(LOWEST_PICKUP_PRICE)}</strong>
+        </span>
+      ) : null}
+      {bag !== null ? (
+        <span className="bb-zip__price-pill">
+          Dumpster bags <strong>{formatUsd(bag)}</strong>
+        </span>
+      ) : null}
+    </p>
   );
 }
 
@@ -163,7 +192,7 @@ function ZipResult({result}: {result: Result}) {
           </p>
           <p className="bb-zip__where">
             {area.label} area · {match.zip} ·{' '}
-            <Link to={bookPickupHref(match)}>Book a pickup</Link>
+            <Link to={bookPickupHref(match)}>Schedule bag pickup</Link>
           </p>
         </div>
       );

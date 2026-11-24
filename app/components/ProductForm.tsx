@@ -102,6 +102,7 @@ export function ProductForm({
         );
       })}
       <AddToCartButton
+        className="bb-btn bb-btn--yellow bb-btn--lg"
         disabled={!selectedVariant || !selectedVariant.availableForSale}
         onClick={() => {
           open('cart');

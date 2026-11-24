@@ -1,8 +1,4 @@
-import {
-  useLoaderData,
-  data,
-  type HeadersFunction,
-} from 'react-router';
+import {useLoaderData, data, type HeadersFunction} from 'react-router';
 import type {Route} from './+types/cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
@@ -39,17 +35,9 @@ export async function action({request, context}: Route.ActionArgs) {
       result = await cart.removeLines(inputs.lineIds);
       break;
     case CartForm.ACTIONS.DiscountCodesUpdate: {
-      const formDiscountCode = inputs.discountCode;
-
-      // User inputted discount code
-      const discountCodes = (
-        formDiscountCode ? [formDiscountCode] : []
-      ) as string[];
-
-      // Combine discount codes already applied on cart
-      discountCodes.push(...inputs.discountCodes);
-
-      result = await cart.updateDiscountCodes(discountCodes);
+      // Bag Buddy doesn't take discount codes on the storefront (Jason's
+      // call): any update just clears codes from the cart.
+      result = await cart.updateDiscountCodes([]);
       break;
     }
     case CartForm.ACTIONS.GiftCardCodesAdd: {
