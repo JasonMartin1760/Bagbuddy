@@ -207,8 +207,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   gap: 0.5rem 0.75rem;
   grid-template-areas:
     'logo logo'
-    'call actions'
-    'service service';
+    'call actions';
   grid-template-columns: minmax(0, 1fr) auto;
   height: auto;
   padding: 0.6rem 0.75rem 0.6rem;
@@ -255,22 +254,6 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 .bb-header__call svg {
   height: 15px;
   width: 15px;
-}
-
-/* Service line under the phone row, in brand purple (no divider line). */
-.bb-header__service {
-  color: var(--bb-purple-darker);
-  font-family: var(--bb-font-heading);
-  font-size: clamp(1.2rem, 5.15vw, 2.6rem);
-  -webkit-text-stroke: 0.6px currentColor;
-  font-weight: 400;
-  grid-area: service;
-  letter-spacing: 0.01em;
-  line-height: 1.15;
-  margin: 0;
-  padding-top: 0;
-  text-align: center;
-  text-wrap: balance;
 }
 
 .bb-header__actions {
@@ -346,8 +329,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
     column-gap: 2rem;
     grid-template-areas:
       'logo logo logo'
-      'call nav actions'
-      'service service service';
+      'call nav actions';
     grid-template-columns: auto minmax(0, 1fr) auto;
     padding: 0.75rem 2rem 0.75rem;
   }
@@ -1279,6 +1261,12 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 .bb-product-card__placeholder img {
   height: auto;
   width: 100%;
+}
+
+/* The placeholder logo sits in a <picture> (AVIF/WebP/PNG); keep the img
+   laid out as the flex item exactly as before. */
+.bb-product-card__placeholder picture {
+  display: contents;
 }
 
 .bb-product-card__title {
@@ -2358,23 +2346,6 @@ aside header h3 {
   margin-top: 0.5rem;
 }
 
-/* Homepage flexibility line under How It Works */
-.bb-flex-line {
-  align-items: center;
-  border-top: 1px solid rgb(255 255 255 / 0.18);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  justify-content: center;
-  margin-top: 1.75rem;
-  padding-top: 1.25rem;
-  text-align: center;
-}
-
-.bb-flex-line p {
-  font-size: 1.02rem;
-  margin: 0;
-}
 
 #placement {
   scroll-margin-top: calc(var(--header-height) + 12px);
@@ -2382,4 +2353,122 @@ aside header h3 {
 
 .bb-pdp .product-form .bb-bag-sheet button.bb-bag-sheet__go {
   width: 100%;
+}
+
+/* Homepage: smaller, secondary Contact button (not a main CTA). */
+.bb-btn.bb-specific-day__btn--small {
+  background: transparent;
+  border: 1.5px solid rgb(255 255 255 / 0.75);
+  box-shadow: none;
+  color: #fff;
+  font-size: 0.95rem;
+  min-height: 42px;
+  padding: 0.45rem 1.3rem;
+}
+
+.bb-btn.bb-specific-day__btn--small:hover {
+  background: #fff;
+  color: var(--bb-purple);
+}
+
+/* Pickup flow: specific-day Contact button directly below Continue */
+.bb-btn.bb-day-btn {
+  box-shadow: none;
+  font-size: 0.92rem;
+  line-height: 1.15;
+  margin-top: 0.6rem;
+  padding: 0.35rem 1rem;
+  text-align: center;
+  white-space: normal;
+}
+.bb-btn.bb-day-btn:hover {
+  background: var(--bb-purple);
+  color: #fff;
+}
+
+/* ---------- Homepage pickup flow (3 screens) ---------- */
+.bb-pickup__section {
+  padding-top: 1.25rem;
+}
+.bb-pickup .bb-card > .bb-fees-step__eyebrow {
+  margin-bottom: 0.2rem;
+}
+.bb-pickup .bb-zip__heading {
+  margin-top: 0;
+}
+.bb-zip__subheading {
+  color: var(--bb-purple-darker);
+  font-weight: 700;
+  margin: 0 0 0.85rem;
+}
+.bb-zip__msg.bb-zip__served-line {
+  font-weight: 800;
+  margin: 0.75rem 0 0;
+}
+.bb-pickup .bb-book__area {
+  margin-top: 0.85rem;
+}
+.bb-pickup__questions {
+  color: var(--bb-muted);
+  font-size: 0.92rem;
+  margin: 1rem 0 0;
+  text-align: center;
+}
+.bb-pickup__questions a {
+  color: var(--bb-purple);
+  font-weight: 700;
+}
+.bb-pickup__before {
+  margin: 0.75rem 0 0;
+  text-align: center;
+}
+.bb-pickup__before summary {
+  color: var(--bb-purple);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.bb-pickup__before[open] {
+  text-align: left;
+}
+.bb-pickup__before[open] summary {
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.bb-pickup-steps__back {
+  background: none;
+  border: 0;
+  color: var(--bb-purple);
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0.75rem auto 0;
+  padding: 0.35rem 0.75rem;
+  text-decoration: underline;
+}
+.bb-pickup-steps__allowed {
+  margin: 0.5rem 0 0.9rem;
+}
+.bb-pickup-steps__allowed a {
+  color: var(--bb-purple);
+  font-weight: 700;
+  text-decoration: underline;
+}
+.bb-pickup-steps__total {
+  background: #f6f2fb;
+  border-radius: 10px;
+  color: var(--bb-purple-darker);
+  font-size: 1.02rem;
+  margin: 0 0 0.25rem;
+  padding: 0.6rem 0.8rem;
+  text-align: center;
+}
+.bb-pickup__section {
+  min-height: 72vh;
+}
+.bb-pickup .bb-book__area .bb-btn {
+  box-sizing: border-box;
 }

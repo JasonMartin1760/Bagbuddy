@@ -966,10 +966,6 @@ const ZIP_INDEX: ReadonlyMap<string, ServiceZip> = new Map(
   SERVICE_ZIPS.map((entry) => [entry.zip, entry]),
 );
 
-export function isValidZip(zip: string): boolean {
-  return /^\d{5}$/.test(zip.trim());
-}
-
 export function findServiceZip(zip: string): ServiceZip | undefined {
   return ZIP_INDEX.get(zip.trim());
 }

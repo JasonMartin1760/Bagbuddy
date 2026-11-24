@@ -3,7 +3,7 @@ import {
   SERVICE_AREAS,
   type ServiceArea,
   type ServiceAreaId,
-} from '~/data/serviceAreas';
+} from '~/data/serviceAreaList';
 
 // Only served areas are drawn. Denver metro (coming soon) is left off the
 // map until version 2.

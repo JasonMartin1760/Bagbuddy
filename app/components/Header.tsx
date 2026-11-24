@@ -24,7 +24,6 @@ type Viewport = 'desktop' | 'mobile';
  * - row 1: the full logo (with its baked-in tagline), centered
  * - row 2: phone number on the left, cart + menu side by side on the right;
  *   on desktop the nav links sit in the middle of this row
- * - row 3: one-line service description, centered
  */
 export function Header({cart}: HeaderProps) {
   return (
@@ -48,7 +47,6 @@ export function Header({cart}: HeaderProps) {
         <CartToggle cart={cart} />
         <HeaderMenuMobileToggle />
       </div>
-      <p className="bb-header__service">{SITE.serviceLine}</p>
     </header>
   );
 }

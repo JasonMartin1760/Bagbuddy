@@ -1,10 +1,9 @@
 import {Link} from 'react-router';
-import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import type {HeaderQuery} from 'storefrontapi.generated';
 import {NAV_ITEMS, SITE, phoneHref} from '~/config/site';
 import {SERVICE_AREAS} from '~/data/serviceAreaList';
 
 interface FooterProps {
-  footer: Promise<FooterQuery | null>;
   header: HeaderQuery;
   publicStoreDomain: string;
 }

@@ -9,6 +9,11 @@ export type ServiceAreaId =
   | 'woodland-park'
   | 'denver-metro';
 
+/** True for exactly 5 digits (surrounding spaces ignored). */
+export function isValidZip(zip: string): boolean {
+  return /^\d{5}$/.test(zip.trim());
+}
+
 export type ServiceStatus = 'served' | 'coming-soon';
 
 export interface ServiceArea {

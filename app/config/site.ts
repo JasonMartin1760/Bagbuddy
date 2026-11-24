@@ -20,10 +20,6 @@ export const SITE = {
   /** Pickup-time promise, used wherever pickup timing is mentioned. */
   pickupPromise: 'We pick up most bags within three business days.',
 
-  /** Homepage flexibility line (Jason's wording). */
-  scheduleFlexLine:
-    "Need it picked up on a certain day? Just ask. We'll do our best to work with your schedule.",
-
   /** Business phone, shown on every click-to-call button. */
   phone: '(719) 419-2257' as string | null,
 
@@ -41,10 +37,12 @@ export const SITE = {
    * TODO(Jason): PLACEHOLDER. This is the full-color Bag Buddy logo JPG
    * (upload b72e…jpg) until the real photo of the truck craning/lifting a
    * dumpster bag arrives. To swap it, drop the photo in /public/images and
-   * change these three lines. Set `src` to null to use the plain purple
-   * gradient instead.
+   * change these lines (set `avifSrc` to null if there's no .avif version).
+   * Set `src` to null to use the plain purple gradient instead.
    */
   heroImage: {
+    /** Smaller AVIF copy, preferred by browsers that support it. */
+    avifSrc: '/images/hero-placeholder.avif' as string | null,
     src: '/images/hero-placeholder.webp' as string | null,
     fallbackSrc: '/images/hero-placeholder.jpg' as string | null,
     alt: 'Bag Buddy Dumpsters logo: a crane hook lifting the word Bag',
@@ -58,6 +56,8 @@ export const SITE = {
    * bag: drop it in /public/images and update these lines.
    */
   bagImage: {
+    /** Smaller AVIF copy; set to null when replacing the photo without one. */
+    avifSrc: '/images/bag-yellow-dumpster-bag.avif' as string | null,
     src: '/images/bag-yellow-dumpster-bag.webp',
     fallbackSrc: '/images/bag-yellow-dumpster-bag.jpg',
     alt: 'Bag Buddy yellow dumpster bag',
@@ -81,6 +81,8 @@ export const SITE = {
   },
 
   truckImage: {
+    /** Smaller AVIF copy; set to null when replacing the photo without one. */
+    avifSrc: '/images/bag-buddy-crane-truck.avif' as string | null,
     src: '/images/bag-buddy-crane-truck.webp',
     fallbackSrc: '/images/bag-buddy-crane-truck.jpg',
     alt: 'Bag Buddy crane truck lifting a full dumpster bag in Colorado Springs',
