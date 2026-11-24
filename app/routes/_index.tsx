@@ -63,7 +63,7 @@ export default function Homepage() {
               alt={hero.alt}
               width={1600}
               height={762}
-              decoding="async"
+              fetchPriority="high"
             />
           </picture>
         ) : null}

@@ -1,10 +1,13 @@
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
+import {useLocation} from 'react-router';
 
 type AsideType = 'search' | 'cart' | 'mobile' | 'closed';
 type AsideContextValue = {
@@ -76,17 +79,21 @@ const AsideContext = createContext<AsideContextValue | null>(null);
 
 Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
   const [type, setType] = useState<AsideType>('closed');
+  const close = useCallback(() => setType('closed'), []);
+  const location = useLocation();
+
+  // Close any open drawer (menu, cart, search) on every navigation,
+  // including the browser's Back / Forward buttons. Otherwise the drawer
+  // stayed open over the previous page with page scrolling locked, which
+  // made the site look frozen.
+  useEffect(() => {
+    setType('closed');
+  }, [location.key]);
+
+  const value = useMemo(() => ({type, open: setType, close}), [type, close]);
 
   return (
-    <AsideContext.Provider
-      value={{
-        type,
-        open: setType,
-        close: () => setType('closed'),
-      }}
-    >
-      {children}
-    </AsideContext.Provider>
+    <AsideContext.Provider value={value}>{children}</AsideContext.Provider>
   );
 };
 

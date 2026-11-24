@@ -17,6 +17,7 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import bagBuddyStyles from '~/styles/bagbuddy.css?url';
 import {PageLayout} from './components/PageLayout';
+import {useEffect} from 'react';
 
 export type RootLoader = typeof loader;
 
@@ -180,8 +181,25 @@ export function Layout({children}: {children?: React.ReactNode}) {
   );
 }
 
+/**
+ * Coming back with the browser's Back button from Shopify checkout (or any
+ * other site) can restore this page from the back/forward cache exactly as
+ * it was left: a "Going to checkout…" button stuck disabled, the pickup
+ * step still open, a stale cart. Reload in that case so the page is live.
+ */
+function useReloadOnBackForwardRestore() {
+  useEffect(() => {
+    function onPageShow(event: PageTransitionEvent) {
+      if (event.persisted) window.location.reload();
+    }
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
+}
+
 export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
+  useReloadOnBackForwardRestore();
 
   if (!data) {
     return <Outlet />;

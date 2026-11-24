@@ -37,6 +37,7 @@ export function Header({cart}: HeaderProps) {
             alt={`${SITE.name}: ${SITE.tagline}`}
             width={640}
             height={305}
+            fetchPriority="high"
           />
         </picture>
       </Link>
