@@ -1671,7 +1671,19 @@ aside header h3 {
 
 .bb-landing-hero h1 {
   font-size: clamp(1.85rem, 7vw, 3rem);
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.5rem;
+}
+
+.bb-landing__brand-line {
+  font-family: var(--bb-font-heading);
+  font-size: clamp(1.35rem, 5vw, 2.1rem);
+  margin: 0 0 0.35rem;
+}
+
+.bb-landing__area-line {
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin: 0 0 0.9rem;
 }
 
 .bb-landing-hero .bb-lead {
@@ -2272,4 +2284,8 @@ aside header h3 {
 .bb-flex-line p {
   font-size: 1.02rem;
   margin: 0;
+}
+
+#placement {
+  scroll-margin-top: calc(var(--header-height) + 12px);
 }

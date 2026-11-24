@@ -1,4 +1,4 @@
-import {type MouseEvent} from 'react';
+import {useId, type MouseEvent} from 'react';
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/dumpster-bag-pickup';
 import {
@@ -6,8 +6,8 @@ import {
   BulletList,
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
-import {EmailButton} from '~/components/bagbuddy/ContactButton';
-import {SITE, phoneHref, smsHref} from '~/config/site';
+import {ContactSheet} from '~/components/ContactSheet';
+import {SITE} from '~/config/site';
 import {
   PRODUCT_PRICING,
   formatUsd,
@@ -19,6 +19,7 @@ import {loadFeeVariants, type FeeVariant} from '~/lib/feeVariants';
 
 const PAGE_PATH = '/dumpster-bag-pickup';
 const CHECKOUT_ID = 'checkout';
+const PLACEMENT_ID = 'placement';
 const PICKUP = PRODUCT_PRICING['pickup-colorado-springs'];
 
 const PICKUP_VARIANT_QUERY = `#graphql
@@ -55,30 +56,15 @@ export async function loader({context, request}: Route.LoaderArgs) {
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
-    {title: `Dumpster Bag Pickup in Colorado Springs | ${SITE.name}`},
+    {title: `Dumpster Bag Pickup Service | ${SITE.name}`},
     {
       name: 'description',
       content:
-        'Already have a filled dumpster bag, like the Bagster®? Book a crane-truck pickup in the Colorado Springs area. We pick up most bags within three business days. Book your pickup online in minutes.',
+        'Dumpster bag pickup service. Any brand, any size. Colorado Springs and surrounding metro area. Already have a filled dumpster bag, like the Bagster®? Book your pickup online in minutes. We pick up most bags within three business days.',
     },
     {rel: 'canonical', href: data?.canonicalUrl ?? PAGE_PATH},
   ];
 };
-
-const STEPS = [
-  {
-    title: 'Get the bag ready',
-    text: 'Tie the handles together and place the bag where our crane truck can reach it. See the placement and fill rules below.',
-  },
-  {
-    title: 'Book your pickup',
-    text: 'Book your pickup online in minutes with the checkout button on this page.',
-  },
-  {
-    title: 'We pick it up',
-    text: 'Our crane truck lifts the bag from your driveway or alley and hauls it away. We pick up most bags within three business days.',
-  },
-] as const;
 
 /**
  * Google Ads landing page for customers who already have a filled dumpster
@@ -97,11 +83,14 @@ export default function DumpsterBagPickupLanding() {
         aria-label="Dumpster bag pickup"
       >
         <div className="bb-container">
-          <h1>Already have a filled dumpster bag? We&rsquo;ll pick it up.</h1>
+          <h1>Dumpster Bag Pickup Service</h1>
+          <p className="bb-landing__brand-line">Any brand, any size</p>
+          <p className="bb-landing__area-line">
+            Colorado Springs and surrounding metro area
+          </p>
           <p className="bb-lead">
-            If you already have a filled dumpster bag, like the Bagster®, Bag
-            Buddy Dumpsters can pick it up in the Colorado Springs area (El Paso
-            County). Book your pickup online in minutes.
+            Already have a filled dumpster bag, like the Bagster®? Book your
+            pickup online in minutes.
           </p>
           {PICKUP.price !== null ? (
             <p className="bb-landing__prices">
@@ -117,6 +106,8 @@ export default function DumpsterBagPickupLanding() {
           />
         </div>
       </section>
+
+      <SpecificDayBand />
 
       <section className="bb-section" aria-labelledby="included-title">
         <div className="bb-container bb-narrow">
@@ -142,27 +133,47 @@ export default function DumpsterBagPickupLanding() {
             How pickup works
           </h2>
           <ol className="bb-steps">
-            {STEPS.map((step, index) => (
-              <li key={step.title} className="bb-step">
-                <span className="bb-step__num" aria-hidden="true">
-                  {index + 1}
-                </span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </li>
-            ))}
+            <li className="bb-step">
+              <span className="bb-step__num" aria-hidden="true">
+                1
+              </span>
+              <h3>Make sure the handles reach together</h3>
+              <p>That&rsquo;s how our crane hooks onto the bag safely.</p>
+            </li>
+            <li className="bb-step">
+              <span className="bb-step__num" aria-hidden="true">
+                2
+              </span>
+              <h3>Place where we can reach it</h3>
+              <p>
+                Leave a clear, safe path for the truck.{' '}
+                <a className="bb-step__link" href={`#${PLACEMENT_ID}`}>
+                  Where can I place my bag dumpster?
+                </a>
+              </p>
+            </li>
+            <li className="bb-step">
+              <span className="bb-step__num" aria-hidden="true">
+                3
+              </span>
+              <h3>We pick it up</h3>
+              <p>
+                Our crane truck lifts the bag from your driveway or alley and
+                hauls it away. {SITE.pickupPromise}
+              </p>
+            </li>
           </ol>
         </div>
       </section>
 
       <CtaBand
         title="Ready to book your pickup?"
-        text="Checkout takes a minute. We pick up most bags within three business days."
+        text={`Checkout takes a minute. ${SITE.pickupPromise}`}
       />
 
       <section
         className="bb-section"
-        id="placement"
+        id={PLACEMENT_ID}
         aria-labelledby="place-title"
       >
         <div className="bb-container">
@@ -212,6 +223,8 @@ export default function DumpsterBagPickupLanding() {
         text="Checkout on this page to book a Colorado Springs area pickup."
       />
 
+      <SpecificDayBand />
+
       <p className="bb-landing__disclaimer">
         Bagster® is a registered trademark of Waste Management, Inc. Bag Buddy
         Dumpsters is an independent company and is not affiliated with, endorsed
@@ -246,7 +259,7 @@ function CheckoutCard({
             {formatUsd(pricing.price)} <small>{pricing.unit}</small>
           </p>
         ) : null}
-        <p className="bb-landing__window">We pick up most bags within three business days.</p>
+        <p className="bb-landing__window">{SITE.pickupPromise}</p>
 
         {variantId ? (
           <FeesStepPurchase
@@ -258,37 +271,43 @@ function CheckoutCard({
             startLabel={`Book pickup${priceLabel}`}
             submitLabel="Continue to checkout"
             intro={PICKUP_FEES_INTRO}
-            note="Next: add any extra-cost items in your bag, then check out."
           />
         ) : (
           <p className="bb-landing__fallback" role="status">
-            Online checkout isn&rsquo;t available right now. <SpecificDayNote />
+            Online checkout isn&rsquo;t available right now.
           </p>
         )}
 
-        {variantId ? (
-          <p className="bb-landing__exception">
-            <SpecificDayNote />
-          </p>
-        ) : null}
-
         <div className="bb-landing__contacts">
-          <EmailButton />
+          <ContactSheet
+            label="Need a specific day?"
+            buttonClassName="bb-btn bb-btn--outline bb-btn--lg"
+            title="How would you like to reach us?"
+          />
         </div>
       </div>
     </div>
   );
 }
 
-function SpecificDayNote() {
-  if (!SITE.phone) {
-    return <>Need a specific day? Call or text and we&rsquo;ll set it up.</>;
-  }
+function SpecificDayBand() {
+  const titleId = useId();
   return (
-    <>
-      Need a specific day? <a href={phoneHref(SITE.phone)}>Call</a> or{' '}
-      <a href={smsHref(SITE.phone)}>text</a> and we&rsquo;ll set it up.
-    </>
+    <section className="bb-specific-day" aria-labelledby={titleId}>
+      <div className="bb-container bb-specific-day__inner">
+        <div>
+          <h2 id={titleId} className="bb-specific-day__title">
+            Need a specific day?
+          </h2>
+          <p>Call, text, or email us and we&rsquo;ll set it up.</p>
+        </div>
+        <ContactSheet
+          label="Contact"
+          buttonClassName="bb-btn bb-btn--lg bb-specific-day__btn"
+          title="How would you like to reach us?"
+        />
+      </div>
+    </section>
   );
 }
 
