@@ -207,7 +207,8 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   gap: 0.5rem 0.75rem;
   grid-template-areas:
     'logo logo'
-    'call actions';
+    'call actions'
+    'service service';
   grid-template-columns: minmax(0, 1fr) auto;
   height: auto;
   padding: 0.6rem 0.75rem 0.6rem;
@@ -235,6 +236,20 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   grid-area: call;
   justify-self: start;
   min-height: 44px;
+}
+
+.bb-header__service {
+  border-top: 1px solid #ece8f6;
+  color: var(--bb-purple);
+  font-family: var(--bb-font-body);
+  font-size: clamp(0.9rem, 4.2vw, 1.05rem);
+  font-weight: 700;
+  grid-area: service;
+  letter-spacing: 0.02em;
+  margin: 0;
+  padding-top: 0.45rem;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .bb-header__actions {
@@ -309,7 +324,8 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
     column-gap: 2rem;
     grid-template-areas:
       'logo logo logo'
-      'call nav actions';
+      'call nav actions'
+      'service service service';
     grid-template-columns: auto minmax(0, 1fr) auto;
     padding: 0.75rem 2rem 0.75rem;
   }

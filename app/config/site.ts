@@ -9,6 +9,8 @@
 export const SITE = {
   name: 'Bag Buddy Dumpsters',
   shortName: 'Bag Buddy',
+  /** One-line service description shown under the header's phone row. */
+  serviceLine: 'Dumpster bags and pickup service',
   /** Tagline from the logo / branding guide. */
   tagline: 'You bag it up, call us up, we’ll pick it up',
 
