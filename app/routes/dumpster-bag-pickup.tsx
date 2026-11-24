@@ -12,13 +12,7 @@ import {
   formatUsd,
   type ProductPricing,
 } from '~/config/pricing';
-import {
-  ALLOWED,
-  HOW_FULL,
-  PICKUP_FEES_INTRO,
-  PICKUP_FEES_SUBTEXT,
-  PLACEMENT,
-} from '~/data/content';
+import {ALLOWED, HOW_FULL, PICKUP_FEES_INTRO, PLACEMENT} from '~/data/content';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
 import {loadFeeVariants, type FeeVariant} from '~/lib/feeVariants';
 
@@ -263,9 +257,7 @@ function CheckoutCard({
             startLabel={`Book pickup${priceLabel}`}
             submitLabel="Continue to checkout"
             intro={PICKUP_FEES_INTRO}
-            subtext={PICKUP_FEES_SUBTEXT}
-            stepLabel="Before checkout"
-            note="Next: tell us about any extra-cost items in your dumpster bag, then check out."
+            note="Next: add any extra-cost items in your bag, then check out."
           />
         ) : (
           <p className="bb-landing__fallback" role="status">
