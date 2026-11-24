@@ -572,7 +572,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 .bb-map__state-label {
   fill: #bdb3dd;
   font-family: var(--bb-font-heading);
-  font-size: 34px;
+  font-size: 30px;
   letter-spacing: 0.12em;
 }
 
@@ -583,9 +583,26 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   stroke-width: 3;
 }
 
+.bb-map__road--minor {
+  stroke-dasharray: 4 6;
+  stroke-width: 2.5;
+}
+
+.bb-map__peak path {
+  fill: #cfc7e8;
+  stroke: #9d93c2;
+  stroke-width: 2;
+}
+
+.bb-map__peak text {
+  fill: #9d93c2;
+  font-size: 22px;
+  font-weight: 700;
+}
+
 .bb-map__road-label {
   fill: #9d93c2;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 700;
 }
 
@@ -605,11 +622,22 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 
 .bb-map__area text {
   fill: var(--bb-purple-darker);
-  font-size: 21px;
+  font-size: 44px;
   font-weight: 800;
   paint-order: stroke;
   stroke: #fff;
-  stroke-width: 5px;
+  stroke-width: 7px;
+}
+
+.bb-map__area--side circle {
+  fill: rgb(71 47 146 / 0.3);
+  stroke-width: 2.5;
+}
+
+.bb-map__area--side text {
+  fill: var(--bb-purple);
+  font-size: 28px;
+  font-weight: 700;
 }
 
 .bb-map__area.is-active circle,
@@ -1241,9 +1269,16 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 }
 
 /* Keep the off-canvas cart/search/menu panels from widening the mobile
-   layout viewport. */
+   layout viewport, and keep them above the (taller, z-index 10) header:
+   the drawers render before the header in the DOM, so an equal z-index
+   let the header paint over the open menu. */
 .overlay {
   overflow: hidden;
+  z-index: 100;
+}
+
+.overlay aside {
+  overflow-y: auto;
 }
 
 aside header h3 {
