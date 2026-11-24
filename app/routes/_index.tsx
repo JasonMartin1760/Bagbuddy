@@ -149,14 +149,23 @@ export default function Homepage() {
               </li>
             ))}
           </ol>
-          <div className="bb-flex-line">
-            <p>{SITE.scheduleFlexLine}</p>
-            <ContactSheet
-              label="Contact us"
-              buttonClassName="bb-btn bb-btn--outline-light bb-flex-line__btn"
-              title="Ask about a pickup day"
-            />
+        </div>
+      </section>
+
+      {/* Same band as the ads landing page: Call / Text / Email sheet. */}
+      <section className="bb-specific-day" aria-labelledby="specific-day-title">
+        <div className="bb-container bb-specific-day__inner">
+          <div>
+            <h2 id="specific-day-title" className="bb-specific-day__title">
+              Need a specific day?
+            </h2>
+            <p>Just ask. We&rsquo;ll do our best to work with your schedule.</p>
           </div>
+          <ContactSheet
+            label="Contact"
+            buttonClassName="bb-btn bb-specific-day__btn bb-specific-day__btn--small"
+            title="How would you like to reach us?"
+          />
         </div>
       </section>
 

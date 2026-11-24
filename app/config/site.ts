@@ -20,9 +20,6 @@ export const SITE = {
   /** Pickup-time promise, used wherever pickup timing is mentioned. */
   pickupPromise: 'We pick up most bags within three business days.',
 
-  /** Homepage flexibility line (Jason's wording). */
-  scheduleFlexLine:
-    "Need it picked up on a certain day? Just ask. We'll do our best to work with your schedule.",
 
   /** Business phone, shown on every click-to-call button. */
   phone: '(719) 419-2257' as string | null,

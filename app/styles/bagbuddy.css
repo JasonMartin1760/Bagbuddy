@@ -207,8 +207,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   gap: 0.5rem 0.75rem;
   grid-template-areas:
     'logo logo'
-    'call actions'
-    'service service';
+    'call actions';
   grid-template-columns: minmax(0, 1fr) auto;
   height: auto;
   padding: 0.6rem 0.75rem 0.6rem;
@@ -255,22 +254,6 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
 .bb-header__call svg {
   height: 15px;
   width: 15px;
-}
-
-/* Service line under the phone row, in brand purple (no divider line). */
-.bb-header__service {
-  color: var(--bb-purple-darker);
-  font-family: var(--bb-font-heading);
-  font-size: clamp(1.2rem, 5.15vw, 2.6rem);
-  -webkit-text-stroke: 0.6px currentColor;
-  font-weight: 400;
-  grid-area: service;
-  letter-spacing: 0.01em;
-  line-height: 1.15;
-  margin: 0;
-  padding-top: 0;
-  text-align: center;
-  text-wrap: balance;
 }
 
 .bb-header__actions {
@@ -346,8 +329,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
     column-gap: 2rem;
     grid-template-areas:
       'logo logo logo'
-      'call nav actions'
-      'service service service';
+      'call nav actions';
     grid-template-columns: auto minmax(0, 1fr) auto;
     padding: 0.75rem 2rem 0.75rem;
   }
@@ -2245,24 +2227,23 @@ aside header h3 {
   margin-top: 0.5rem;
 }
 
-/* Homepage flexibility line under How It Works */
-.bb-flex-line {
-  align-items: center;
-  border-top: 1px solid rgb(255 255 255 / 0.18);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  justify-content: center;
-  margin-top: 1.75rem;
-  padding-top: 1.25rem;
-  text-align: center;
-}
-
-.bb-flex-line p {
-  font-size: 1.02rem;
-  margin: 0;
-}
 
 .bb-pdp .product-form .bb-bag-sheet button.bb-bag-sheet__go {
   width: 100%;
+}
+
+/* Homepage: smaller, secondary Contact button (not a main CTA). */
+.bb-btn.bb-specific-day__btn--small {
+  background: transparent;
+  border: 1.5px solid rgb(255 255 255 / 0.75);
+  box-shadow: none;
+  color: #fff;
+  font-size: 0.95rem;
+  min-height: 42px;
+  padding: 0.45rem 1.3rem;
+}
+
+.bb-btn.bb-specific-day__btn--small:hover {
+  background: #fff;
+  color: var(--bb-purple);
 }
