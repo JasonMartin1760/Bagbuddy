@@ -83,14 +83,6 @@ export const ABOUT = {
   ],
 } as const;
 
-const feeText = (kind: 'electronics-addon' | 'mattress-addon') => {
-  const price = PRODUCT_PRICING[kind].price;
-  return price !== null ? formatUsd(price) : '';
-};
-
-/** Shown on the bag page: extra item fees are charged at pickup only. */
-export const BAG_FEES_NOTE = `Extra item fees (${feeText('electronics-addon')} large electronics, ${feeText('mattress-addon')} mattress/box spring) are only charged when you schedule your pickup.`;
-
 /** Intro on the pickup add-ons step. */
 export const PICKUP_FEES_INTRO =
   "These charges apply at pickup. If any of these items are in the bag we're picking up, add one fee for each item now so it's included in your pickup checkout.";

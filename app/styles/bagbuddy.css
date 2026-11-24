@@ -1616,16 +1616,6 @@ aside header h3 {
   opacity: 0.9;
 }
 
-.bb-bag-fees-note {
-  background: #fffbd6;
-  border-left: 6px solid var(--bb-yellow-dark);
-  border-radius: 10px;
-  color: var(--bb-purple-darker);
-  line-height: 1.45;
-  margin: 1rem 0 0;
-  padding: 0.75rem 0.9rem;
-}
-
 /* ---------- Bag buy box ---------- */
 .bb-buybox__qty-row {
   align-items: center;

@@ -35,7 +35,6 @@ import {
 import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
 import {
   ALLOWED,
-  BAG_FEES_NOTE,
   PICKUP_FEES_INTRO,
   getContentByKind,
   getProductContent,
@@ -205,7 +204,6 @@ function ShopifyProduct({
               selectedVariant={selectedVariant}
             />
           )}
-          {pricing?.kind === 'dumpster-bag' ? <BagFeesNote /> : null}
           <ProductCrossLinks kind={pricing?.kind} />
           {descriptionHtml ? (
             <div
@@ -287,15 +285,6 @@ function PlannedProduct({pricing}: {pricing: ProductPricing}) {
       </div>
       <ProductContentBlocks blocks={content.blocks} />
     </div>
-  );
-}
-
-/** Bag page: extra item fees are only charged at pickup, not now. */
-function BagFeesNote() {
-  return (
-    <p className="bb-bag-fees-note" role="note">
-      <strong>{BAG_FEES_NOTE}</strong>
-    </p>
   );
 }
 
