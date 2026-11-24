@@ -6,6 +6,7 @@ import {
   BulletList,
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
+import {EmailButton} from '~/components/bagbuddy/ContactButton';
 import {SITE, phoneHref, smsHref} from '~/config/site';
 import {
   PRODUCT_PRICING,
@@ -270,6 +271,10 @@ function CheckoutCard({
             <SpecificDayNote />
           </p>
         ) : null}
+
+        <div className="bb-landing__contacts">
+          <EmailButton />
+        </div>
       </div>
     </div>
   );

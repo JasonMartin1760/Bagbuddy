@@ -1734,6 +1734,10 @@ aside header h3 {
   text-decoration: underline;
 }
 
+.bb-landing__contacts {
+  margin-top: 0.9rem;
+}
+
 .bb-landing__error {
   color: var(--bb-red);
   font-size: 0.92rem;
