@@ -12,7 +12,7 @@ import {
   formatUsd,
   type ProductPricing,
 } from '~/config/pricing';
-import {ALLOWED, HOW_FULL, PLACEMENT} from '~/data/content';
+import {ALLOWED, HOW_FULL, PICKUP_FEES_INTRO, PLACEMENT} from '~/data/content';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
 import {loadFeeVariants, type FeeVariant} from '~/lib/feeVariants';
 
@@ -256,7 +256,7 @@ function CheckoutCard({
             startClassName="bb-btn bb-btn--yellow bb-btn--lg"
             startLabel={`Book pickup${priceLabel}`}
             submitLabel="Continue to checkout"
-            intro="Some items cost extra to dispose of. If any of these are in the bag we're picking up, add one fee for each item now."
+            intro={PICKUP_FEES_INTRO}
             note="Next: add any extra-cost items in your bag, then check out."
           />
         ) : (
