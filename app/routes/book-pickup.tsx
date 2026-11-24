@@ -1,19 +1,13 @@
 import {Link, useLoaderData, useSearchParams} from 'react-router';
 import type {Route} from './+types/book-pickup';
 import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
-import {CallButton} from '~/components/bagbuddy/ContactButton';
 import {ContactSheet} from '~/components/ContactSheet';
 import {BulletList} from '~/components/bagbuddy/InfoBlocks';
-import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
+import {PickupSteps} from '~/components/bagbuddy/PickupSteps';
 import {loadFeeVariants} from '~/lib/feeVariants';
 import {productDataCache} from '~/lib/cache';
-import {BUY_BAG_PATH, SITE} from '~/config/site';
-import {
-  HOW_FULL,
-  PICKUP_FEES_INTRO,
-  PICKUP_FEES_SUBTEXT,
-  PLACEMENT,
-} from '~/data/content';
+import {BUY_BAG_PATH, SITE, phoneHref} from '~/config/site';
+import {HOW_FULL, PLACEMENT} from '~/data/content';
 import {
   SERVICE_AREAS,
   findServiceZip,
@@ -135,102 +129,65 @@ export default function BookPickup() {
     />
   );
 
-  const zipForEmail = match?.zip ?? initialZip;
-  const subject = encodeURIComponent('Pickup request');
-  const body = encodeURIComponent(
-    `Hi Bag Buddy,\n\nI'd like to book a pickup.\n\nZip code: ${zipForEmail}\nAddress:\nWhere the bag is placed:\nItems that need add-on fees (TVs, mattresses):\nPreferred day:\n\nThanks!`,
-  );
-
   return (
-    <div className="bb-page">
-      <section className="bb-page__hero">
-        <div className="bb-container">
-          <h1>Schedule Bag Pickup</h1>
-          <p className="bb-lead">
-            Filled your bag? Enter your zip code to see your pickup price, add
-            any extra items, then check out. Or give us a call.
-          </p>
-          <p className="bb-page__promise">{SITE.pickupPromise}</p>
-        </div>
-      </section>
-
-      <section className="bb-section">
+    <div className="bb-page bb-pickup">
+      <section className="bb-section bb-pickup__section">
         <div className="bb-container bb-book">
           <div className="bb-card">
-            <ol className="bb-flow-steps" aria-label="Pickup steps">
-              <li aria-current={pickup ? undefined : 'step'}>1. Zip code</li>
-              <li aria-current={pickup ? 'step' : undefined}>2. Extra items</li>
-              <li>3. Checkout</li>
-            </ol>
+            <p className="bb-fees-step__eyebrow">Step 1 of 3</p>
             <ZipChecker
-              heading="Enter your 5-digit zip code"
-              helpText="We'll show whether we serve your area and your exact pickup price."
-              headingLevel="h2"
+              heading="Where’s your bag?"
+              subheading={SITE.pickupPromise}
+              headingLevel="h1"
               initialZip={initialZip}
               onAreaChange={setMatch}
               variant="flow"
+              compactServed
+              placeholder="5-digit zip"
             />
             {pickup ? (
               <div className="bb-book__area" ref={areaRef}>
-                {/* Price is already in the zip result; show it here only when
-                    the area came from a link without a zip. */}
-                {match ? null : (
-                  <>
-                    <p className="bb-book__area-label">{pickup.label}</p>
-                    {pickup.price !== null ? (
-                      <p className="bb-book__area-price">
-                        {formatUsd(pickup.price)} <small>{pickup.unit}</small>
-                      </p>
-                    ) : null}
-                  </>
+                {/* The zip result already shows the price; show it here only
+                    when the area came from a link without a zip. */}
+                {match || !area || pickup.price === null ? null : (
+                  <p className="bb-zip__msg bb-zip__msg--success bb-zip__served-line">
+                    ✅ We serve the {getServiceArea(area).label} area
+                    {` · ${formatUsd(pickup.price)} per pickup`}
+                  </p>
                 )}
                 {pickupVariant?.availableForSale ? (
-                  <FeesStepPurchase
+                  <PickupSteps
                     key={pickup.handle}
                     mainVariant={pickupVariant}
                     feeVariants={feeVariants}
-                    mainAttributeKey="Add-on items reviewed"
-                    goTo="checkout"
-                    startLabel="Continue"
-                    submitLabel="Continue to checkout"
-                    intro={PICKUP_FEES_INTRO}
-                    subtext={PICKUP_FEES_SUBTEXT}
-                    stepLabel="Step 2 of 3"
+                    pickupPrice={pickup.price}
                     afterStart={specificDayButton}
                   />
                 ) : (
                   <>
                     <Link
-                      className="bb-btn bb-btn--yellow bb-btn--lg"
+                      className="bb-btn bb-btn--yellow bb-btn--lg bb-buy__start"
                       to={`/products/${pickup.handle}`}
                     >
                       Book &amp; pay for pickup
                     </Link>
+                    {specificDayButton}
                   </>
                 )}
               </div>
             ) : null}
-            <div className="bb-book__actions">
-              <CallButton />
-              <a
-                className="bb-btn bb-btn--purple"
-                href={`mailto:${SITE.email}?subject=${subject}&body=${body}`}
-              >
-                Request a pickup by email
-              </a>
-            </div>
-            <p className="bb-muted">
-              Don&rsquo;t have a bag yet?{' '}
-              <Link to={BUY_BAG_PATH}>Buy a dumpster bag</Link>.
-            </p>
           </div>
-        </div>
-      </section>
-
-      <section className="bb-section bb-section--tint">
-        <div className="bb-container bb-book">
-          <div>
-            <h2 className="bb-section__title">Before we arrive</h2>
+          <p className="bb-pickup__questions">
+            {SITE.phone ? (
+              <>
+                Questions? Call <a href={phoneHref(SITE.phone)}>{SITE.phone}</a>
+                {' · '}
+              </>
+            ) : null}
+            Need a bag? <Link to={BUY_BAG_PATH}>Buy one</Link>
+          </p>
+          <details className="bb-pickup__before">
+            <summary>Before we arrive</summary>
             <BulletList
               items={[
                 HOW_FULL.points[0],
@@ -238,7 +195,7 @@ export default function BookPickup() {
                 ...PLACEMENT.points.slice(1, 4),
               ]}
             />
-          </div>
+          </details>
         </div>
       </section>
     </div>

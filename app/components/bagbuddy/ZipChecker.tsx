@@ -1,4 +1,11 @@
-import {useEffect, useId, useRef, useState, type FormEvent} from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 import {Link} from 'react-router';
 import type {ServiceZip} from '~/data/serviceAreas';
 import {
@@ -37,8 +44,17 @@ export function ZipChecker({
   initialZip = '',
   variant = 'default',
   className = '',
+  subheading,
+  compactServed = false,
+  placeholder = '5-digit zip code',
 }: {
   heading: string;
+  /** Optional short line under the heading (homepage pickup flow). */
+  subheading?: ReactNode;
+  /** Served result as one line: "✅ We serve your area · $130 per pickup". Off by default. */
+  compactServed?: boolean;
+  /** Input placeholder. */
+  placeholder?: string;
   helpText?: string;
   /** Called after each check with the matched zip (served or coming soon), or null. */
   onAreaChange?: (match: ServiceZip | null) => void;
@@ -116,9 +132,8 @@ export function ZipChecker({
 
   return (
     <div className={`bb-zip bb-zip--${variant} ${className}`.trim()}>
-      {inline ? null : (
-        <Heading className="bb-zip__heading">{heading}</Heading>
-      )}
+      {inline ? null : <Heading className="bb-zip__heading">{heading}</Heading>}
+      {subheading ? <p className="bb-zip__subheading">{subheading}</p> : null}
       {variant === 'default' ? <PriceNote /> : null}
       {inline ? (
         <label htmlFor={inputId} className="bb-zip__label">
@@ -145,7 +160,7 @@ export function ZipChecker({
           inputMode="numeric"
           autoComplete="postal-code"
           pattern="[0-9]*"
-          placeholder="5-digit zip code"
+          placeholder={placeholder}
           aria-describedby={helpText ? helpId : undefined}
           aria-invalid={result.status === 'invalid'}
           value={zip}
@@ -166,10 +181,7 @@ export function ZipChecker({
             }
           }}
         />
-        <button
-          type="submit"
-          className="bb-btn bb-zip__submit"
-        >
+        <button type="submit" className="bb-btn bb-zip__submit">
           Verify
         </button>
       </form>
@@ -182,7 +194,11 @@ export function ZipChecker({
         {inline ? (
           <InlineResult result={result} />
         ) : (
-          <ZipResult result={result} variant={variant} />
+          <ZipResult
+            result={result}
+            variant={variant}
+            compactServed={compactServed}
+          />
         )}
       </div>
     </div>
@@ -283,9 +299,11 @@ function checkZip(raw: string, lookup: ZipLookup | null): Result {
 function ZipResult({
   result,
   variant,
+  compactServed = false,
 }: {
   result: Result;
   variant: 'default' | 'flow' | 'banner' | 'inline';
+  compactServed?: boolean;
 }) {
   const showContact = variant !== 'default';
   switch (result.status) {
@@ -332,6 +350,14 @@ function ZipResult({
       const {match} = result;
       const area = getServiceArea(match.area);
       const price = PICKUP_STARTING_PRICE[match.area];
+      if (compactServed) {
+        return (
+          <p className="bb-zip__msg bb-zip__msg--success bb-zip__served-line">
+            ✅ We serve your area
+            {price !== null ? ` · ${formatUsd(price)} per pickup` : ''}
+          </p>
+        );
+      }
       return (
         <div className="bb-zip__msg bb-zip__msg--success">
           <p className="bb-zip__served">✅ We serve your area!</p>

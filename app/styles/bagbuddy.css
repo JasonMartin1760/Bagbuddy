@@ -2268,3 +2268,90 @@ aside header h3 {
   background: var(--bb-purple);
   color: #fff;
 }
+
+/* ---------- Homepage pickup flow (3 screens) ---------- */
+.bb-pickup__section {
+  padding-top: 1.25rem;
+}
+.bb-pickup .bb-card > .bb-fees-step__eyebrow {
+  margin-bottom: 0.2rem;
+}
+.bb-pickup .bb-zip__heading {
+  margin-top: 0;
+}
+.bb-zip__subheading {
+  color: var(--bb-purple-darker);
+  font-weight: 700;
+  margin: 0 0 0.85rem;
+}
+.bb-zip__msg.bb-zip__served-line {
+  font-weight: 800;
+  margin: 0.75rem 0 0;
+}
+.bb-pickup .bb-book__area {
+  margin-top: 0.85rem;
+}
+.bb-pickup__questions {
+  color: var(--bb-muted);
+  font-size: 0.92rem;
+  margin: 1rem 0 0;
+  text-align: center;
+}
+.bb-pickup__questions a {
+  color: var(--bb-purple);
+  font-weight: 700;
+}
+.bb-pickup__before {
+  margin: 0.75rem 0 0;
+  text-align: center;
+}
+.bb-pickup__before summary {
+  color: var(--bb-purple);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.bb-pickup__before[open] {
+  text-align: left;
+}
+.bb-pickup__before[open] summary {
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.bb-pickup-steps__back {
+  background: none;
+  border: 0;
+  color: var(--bb-purple);
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0.75rem auto 0;
+  padding: 0.35rem 0.75rem;
+  text-decoration: underline;
+}
+.bb-pickup-steps__allowed {
+  margin: 0.5rem 0 0.9rem;
+}
+.bb-pickup-steps__allowed a {
+  color: var(--bb-purple);
+  font-weight: 700;
+  text-decoration: underline;
+}
+.bb-pickup-steps__total {
+  background: #f6f2fb;
+  border-radius: 10px;
+  color: var(--bb-purple-darker);
+  font-size: 1.02rem;
+  margin: 0 0 0.25rem;
+  padding: 0.6rem 0.8rem;
+  text-align: center;
+}
+.bb-pickup__section {
+  min-height: 72vh;
+}
+.bb-pickup .bb-book__area .bb-btn {
+  box-sizing: border-box;
+}
