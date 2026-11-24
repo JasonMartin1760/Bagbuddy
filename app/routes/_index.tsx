@@ -109,6 +109,9 @@ export default function Homepage() {
                 <span className="bb-step__num" aria-hidden="true">
                   {index + 1}
                 </span>
+                {index === 2 ? (
+                  <TruckPhoto className="bb-step__photo" />
+                ) : null}
                 <h3>{step.title}</h3>
                 <p>{step.text}</p>
                 {index === 0 && bag.price !== null ? (
@@ -190,16 +193,19 @@ export default function Homepage() {
       <Testimonials />
 
       <section className="bb-section" id="about" aria-labelledby="about-title">
-        <div className="bb-container bb-narrow">
+        <div className="bb-container bb-about">
           <h2 id="about-title" className="bb-section__title">
             {ABOUT.title}
           </h2>
-          {ABOUT.paragraphs.map((paragraph) => (
-            <p key={paragraph} className="bb-lead bb-about__text">
-              {paragraph}
-            </p>
-          ))}
-          <div className="bb-cta-row">
+          <div className="bb-about__story">
+            {ABOUT.paragraphs.map((paragraph) => (
+              <p key={paragraph} className="bb-lead bb-about__text">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          <TruckPhoto className="bb-about__photo" />
+          <div className="bb-cta-row bb-about__cta">
             <Link
               className="bb-btn bb-btn--purple bb-btn--lg"
               to={BUY_BAG_PATH}
@@ -281,5 +287,23 @@ function Testimonials() {
         ) : null}
       </div>
     </section>
+  );
+}
+
+/** Jason's truck photo; below the fold, so it lazy-loads. */
+function TruckPhoto({className}: {className: string}) {
+  const img = SITE.truckImage;
+  return (
+    <picture className={className}>
+      <source srcSet={img.src} type="image/webp" />
+      <img
+        src={img.fallbackSrc}
+        alt={img.alt}
+        width={img.width}
+        height={img.height}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
   );
 }

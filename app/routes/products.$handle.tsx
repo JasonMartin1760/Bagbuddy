@@ -159,7 +159,9 @@ function ShopifyProduct({
     <div className="bb-pdp">
       <div className="bb-container bb-pdp__top">
         <div className="bb-pdp__media">
-          {selectedVariant?.image ? (
+          {pricing?.kind === 'dumpster-bag' ? (
+            <BagProductImage />
+          ) : selectedVariant?.image ? (
             <ProductImage image={selectedVariant.image} />
           ) : (
             <ProductPlaceholderImage />
@@ -284,6 +286,25 @@ function PlannedProduct({pricing}: {pricing: ProductPricing}) {
         </div>
       </div>
       <ProductContentBlocks blocks={content.blocks} />
+    </div>
+  );
+}
+
+/** Local static bag photo (placeholder, see SITE.bagImage). */
+function BagProductImage() {
+  const img = SITE.bagImage;
+  return (
+    <div className="product-image bb-pdp__bag-image">
+      <picture>
+        <source srcSet={img.src} type="image/webp" />
+        <img
+          src={img.fallbackSrc}
+          alt={img.alt}
+          width={img.width}
+          height={img.height}
+          fetchPriority="high"
+        />
+      </picture>
     </div>
   );
 }
