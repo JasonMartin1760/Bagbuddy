@@ -16,6 +16,7 @@ import type {ProductFragment} from 'storefrontapi.generated';
 import {ProductPlaceholderImage} from '~/components/ProductItem';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
+import {BagBuyBox} from '~/components/bagbuddy/BagBuyBox';
 import {loadFeeVariants, type FeeVariant} from '~/lib/feeVariants';
 import {
   AllowedLists,
@@ -34,6 +35,8 @@ import {
 import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
 import {
   ALLOWED,
+  BAG_FEES_NOTE,
+  PICKUP_FEES_INTRO,
   getContentByKind,
   getProductContent,
   type ContentBlock,
@@ -95,12 +98,10 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  // The bag's and pickups' required add-ons step needs the fee variants.
+  // The pickups' required add-ons step needs the fee variants.
   const kind = findProductPricing(product)?.kind;
   const feeVariants =
-    kind && (kind === 'dumpster-bag' || isPickupKind(kind))
-      ? await loadFeeVariants(storefront)
-      : [];
+    kind && isPickupKind(kind) ? await loadFeeVariants(storefront) : [];
 
   return {
     product,
@@ -186,24 +187,17 @@ function ShopifyProduct({
             ))}
           </ul>
           {pricing?.kind === 'dumpster-bag' ? (
-            <FeesStepPurchase
-              mainVariant={{...selectedVariant, selectedVariant}}
-              feeVariants={feeVariants}
-              mainAttributeKey="Additional fees reviewed"
-              startLabel="Add to cart"
-              submitLabel="Add to cart"
-              intro="Some items cost extra to dispose of. If any of these will go in your bag, add one fee for each item now."
-              note="Next: review the additional item charges before your bag is added."
-            />
+            <BagBuyBox variant={selectedVariant} unitPrice={pricing.price} />
           ) : pricing && isPickupKind(pricing.kind) ? (
             <FeesStepPurchase
               mainVariant={{...selectedVariant, selectedVariant}}
               feeVariants={feeVariants}
               mainAttributeKey="Add-on items reviewed"
-              startLabel="Add pickup to cart"
-              submitLabel="Add pickup to cart"
-              intro="Some items cost extra to dispose of. If any of these are in the bag we're picking up, add one fee for each item now."
-              note="Next: add any extra-cost items in your bag before checkout."
+              goTo="checkout"
+              startLabel="Schedule pickup"
+              submitLabel="Continue to checkout"
+              intro={PICKUP_FEES_INTRO}
+              note="Next: add any extra-cost items in your bag, then check out."
             />
           ) : (
             <ProductForm
@@ -211,6 +205,7 @@ function ShopifyProduct({
               selectedVariant={selectedVariant}
             />
           )}
+          {pricing?.kind === 'dumpster-bag' ? <BagFeesNote /> : null}
           <ProductCrossLinks kind={pricing?.kind} />
           {descriptionHtml ? (
             <div
@@ -292,6 +287,15 @@ function PlannedProduct({pricing}: {pricing: ProductPricing}) {
       </div>
       <ProductContentBlocks blocks={content.blocks} />
     </div>
+  );
+}
+
+/** Bag page: extra item fees are only charged at pickup, not now. */
+function BagFeesNote() {
+  return (
+    <p className="bb-bag-fees-note" role="note">
+      <strong>{BAG_FEES_NOTE}</strong>
+    </p>
   );
 }
 
