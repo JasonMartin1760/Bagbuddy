@@ -117,19 +117,14 @@ export default function BookPickup() {
     return () => window.clearTimeout(id);
   }, [pickupHandle]);
 
-  const specificDayNote = (
-    <div className="bb-day-note">
-      <p className="bb-day-note__text">
-        Need a specific pickup day? Contact us before you order to make sure
-        we&rsquo;re available.
-      </p>
-      <ContactSheet
-        label="Contact"
-        buttonClassName="bb-btn bb-day-note__btn"
-        title="Ask about a specific pickup day"
-        emailSubject="Specific pickup day request"
-      />
-    </div>
+  // Shown only after a served zip result, directly below Continue.
+  const specificDayButton = (
+    <ContactSheet
+      label="Need a specific pickup day? Contact us first"
+      buttonClassName="bb-btn bb-btn--outline bb-btn--lg bb-buy__start bb-day-btn"
+      title="Ask about a specific pickup day"
+      emailSubject="Specific pickup day request"
+    />
   );
 
   const zipForEmail = match?.zip ?? initialZip;
@@ -193,12 +188,10 @@ export default function BookPickup() {
                     intro={PICKUP_FEES_INTRO}
                     subtext={PICKUP_FEES_SUBTEXT}
                     stepLabel="Step 2 of 3"
-                    beforeStart={specificDayNote}
-                    note="Next: tell us about any extra-cost items in your bag, then check out."
+                    afterStart={specificDayButton}
                   />
                 ) : (
                   <>
-                    {specificDayNote}
                     <Link
                       className="bb-btn bb-btn--yellow bb-btn--lg"
                       to={`/products/${pickup.handle}`}
@@ -223,22 +216,6 @@ export default function BookPickup() {
               <Link to={BUY_BAG_PATH}>Buy a dumpster bag</Link>.
             </p>
           </div>
-        </div>
-      </section>
-
-      <section className="bb-specific-day" aria-labelledby="specific-day-title">
-        <div className="bb-container bb-book bb-specific-day__inner">
-          <div>
-            <h2 id="specific-day-title" className="bb-specific-day__title">
-              Need a specific day or time?
-            </h2>
-            <p>Just ask. We&rsquo;ll do our best to work with your schedule.</p>
-          </div>
-          <ContactSheet
-            label="Contact us"
-            buttonClassName="bb-btn bb-btn--lg bb-specific-day__btn"
-            title="Ask about a specific day or time"
-          />
         </div>
       </section>
 

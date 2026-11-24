@@ -2248,29 +2248,17 @@ aside header h3 {
   color: var(--bb-purple);
 }
 
-/* Homepage pickup flow: specific-day note above Continue */
-.bb-day-note {
-  align-items: center;
-  display: flex;
-  gap: 0.6rem;
-  margin: 0 0 0.6rem;
-}
-.bb-day-note__text {
-  font-size: 0.85rem;
-  line-height: 1.3;
-  margin: 0;
-}
-.bb-btn.bb-day-note__btn {
-  background: transparent;
-  border: 1.5px solid var(--bb-purple);
+/* Pickup flow: specific-day Contact button directly below Continue */
+.bb-btn.bb-day-btn {
   box-shadow: none;
-  color: var(--bb-purple);
-  flex-shrink: 0;
-  font-size: 0.85rem;
-  min-height: 36px;
-  padding: 0.3rem 0.85rem;
+  font-size: 0.92rem;
+  line-height: 1.15;
+  margin-top: 0.6rem;
+  padding: 0.35rem 1rem;
+  text-align: center;
+  white-space: normal;
 }
-.bb-btn.bb-day-note__btn:hover {
+.bb-btn.bb-day-btn:hover {
   background: var(--bb-purple);
   color: #fff;
 }
