@@ -57,6 +57,9 @@ export default function Homepage() {
       >
         {hero.src ? (
           <picture className="bb-hero__bg">
+            {hero.avifSrc ? (
+              <source srcSet={hero.avifSrc} type="image/avif" />
+            ) : null}
             <source
               srcSet={hero.src}
               type={hero.src.endsWith('.webp') ? 'image/webp' : undefined}
@@ -330,6 +333,7 @@ function TruckPhoto({className}: {className: string}) {
   const img = SITE.truckImage;
   return (
     <picture className={className}>
+      {img.avifSrc ? <source srcSet={img.avifSrc} type="image/avif" /> : null}
       <source srcSet={img.src} type="image/webp" />
       <img
         src={img.fallbackSrc}

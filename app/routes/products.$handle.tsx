@@ -18,6 +18,7 @@ import {CallButton} from '~/components/bagbuddy/ContactButton';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
 import {BagBuyBox} from '~/components/bagbuddy/BagBuyBox';
 import {loadFeeVariants, type FeeVariant} from '~/lib/feeVariants';
+import {productDataCache} from '~/lib/cache';
 import {
   AllowedLists,
   BulletList,
@@ -79,6 +80,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      cache: productDataCache(storefront),
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
@@ -101,7 +103,9 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The pickups' required add-ons step needs the fee variants.
   const kind = findProductPricing(product)?.kind;
   const feeVariants =
-    kind && isPickupKind(kind) ? await loadFeeVariants(storefront) : [];
+    kind && isPickupKind(kind)
+      ? await loadFeeVariants(storefront, productDataCache(storefront))
+      : [];
 
   return {
     product,
@@ -299,6 +303,7 @@ function BagProductImage() {
   return (
     <div className="product-image bb-pdp__bag-image">
       <picture>
+        {img.avifSrc ? <source srcSet={img.avifSrc} type="image/avif" /> : null}
         <source srcSet={img.src} type="image/webp" />
         <img
           src={img.fallbackSrc}

@@ -6,6 +6,7 @@ import {ContactSheet} from '~/components/ContactSheet';
 import {BulletList} from '~/components/bagbuddy/InfoBlocks';
 import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
 import {loadFeeVariants} from '~/lib/feeVariants';
+import {productDataCache} from '~/lib/cache';
 import {BUY_BAG_PATH, SITE} from '~/config/site';
 import {
   HOW_FULL,
@@ -21,7 +22,12 @@ import {
   type ServiceZip,
 } from '~/data/serviceAreas';
 import {PRODUCT_PRICING, formatUsd, getPickupPricing} from '~/config/pricing';
+import {provideZipLookup} from '~/lib/zipLookup';
 import {useEffect, useRef, useState} from 'react';
+
+// This page checks a ?zip= link during its first render, so it ships the zip
+// list with the page and hands it to the zip checker.
+provideZipLookup(findServiceZip);
 
 const PICKUP_VARIANTS_QUERY = `#graphql
   query PickupVariants(
@@ -47,13 +53,15 @@ const PICKUP_VARIANTS_QUERY = `#graphql
 
 /** Pickup product variants, so a served zip can add its pickup to the cart. */
 export async function loader({context}: Route.LoaderArgs) {
-  const feeVariantsPromise = loadFeeVariants(context.storefront);
+  const cache = productDataCache(context.storefront);
+  const feeVariantsPromise = loadFeeVariants(context.storefront, cache);
   const springs = PRODUCT_PRICING['pickup-colorado-springs'];
   const woodland = PRODUCT_PRICING['pickup-woodland-park'];
   const variants: Record<string, {id: string; availableForSale: boolean}> = {};
   try {
     const data = await context.storefront.query(PICKUP_VARIANTS_QUERY, {
       variables: {springs: springs.handle, woodland: woodland.handle},
+      cache,
     });
     const s = data.springs?.selectedOrFirstAvailableVariant;
     const w = data.woodland?.selectedOrFirstAvailableVariant;

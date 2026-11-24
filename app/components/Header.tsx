@@ -30,6 +30,7 @@ export function Header({cart}: HeaderProps) {
     <header className="header bb-header">
       <Link prefetch="intent" to="/" className="bb-header__logo">
         <picture>
+          <source srcSet="/images/bagbuddy-logo-color.avif" type="image/avif" />
           <source srcSet="/images/bagbuddy-logo-color.webp" type="image/webp" />
           <img
             src="/images/bagbuddy-logo-color.png"

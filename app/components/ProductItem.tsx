@@ -57,13 +57,17 @@ export function ProductItem({
 export function ProductPlaceholderImage() {
   return (
     <div className="bb-product-card__placeholder" aria-hidden="true">
-      <img
-        src="/images/bagbuddy-logo-white.png"
-        alt=""
-        width={640}
-        height={304}
-        loading="lazy"
-      />
+      <picture>
+        <source srcSet="/images/bagbuddy-logo-white.avif" type="image/avif" />
+        <source srcSet="/images/bagbuddy-logo-white.webp" type="image/webp" />
+        <img
+          src="/images/bagbuddy-logo-white.png"
+          alt=""
+          width={640}
+          height={304}
+          loading="lazy"
+        />
+      </picture>
     </div>
   );
 }

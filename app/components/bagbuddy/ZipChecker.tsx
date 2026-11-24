@@ -1,12 +1,12 @@
-import {useId, useState, type FormEvent} from 'react';
+import {useEffect, useId, useRef, useState, type FormEvent} from 'react';
 import {Link} from 'react-router';
+import type {ServiceZip} from '~/data/serviceAreas';
 import {
-  findServiceZip,
   getServiceArea,
   isValidZip,
   type ServiceAreaId,
-  type ServiceZip,
-} from '~/data/serviceAreas';
+} from '~/data/serviceAreaList';
+import {getZipLookup, loadZipLookup, type ZipLookup} from '~/lib/zipLookup';
 import {
   LOWEST_PICKUP_PRICE,
   PICKUP_STARTING_PRICE,
@@ -61,17 +61,52 @@ export function ZipChecker({
   const inputId = useId();
   const helpId = useId();
   const [zip, setZip] = useState(initialZip);
-  const [result, setResult] = useState<Result>(() => checkZip(initialZip));
+  const [result, setResult] = useState<Result>(() =>
+    checkZip(initialZip, getZipLookup()),
+  );
   const Heading = headingLevel;
+  // Latest value checked, so a slow first load of the zip list can't
+  // overwrite a newer check.
+  const latestCheck = useRef(initialZip);
 
-  function runCheck(value: string) {
-    const next = checkZip(value);
-    setResult(next.status === 'idle' ? {status: 'invalid'} : next);
-    onAreaChange?.(
-      next.status === 'served' || next.status === 'coming-soon'
-        ? next.match
-        : null,
-    );
+  // An initial zip whose list wasn't loaded yet (pages that don't provide
+  // it): check it as soon as the list arrives.
+  useEffect(() => {
+    if (!initialZip || getZipLookup() || !isValidZip(initialZip)) return;
+    let active = true;
+    void loadZipLookup().then((lookup) => {
+      if (active && latestCheck.current === initialZip) {
+        setResult(checkZip(initialZip, lookup));
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [initialZip]);
+
+  function runCheck(value: string, onChecked?: (next: Result) => void) {
+    latestCheck.current = value;
+    const apply = (next: Result) => {
+      setResult(next.status === 'idle' ? {status: 'invalid'} : next);
+      onAreaChange?.(
+        next.status === 'served' || next.status === 'coming-soon'
+          ? next.match
+          : null,
+      );
+      onChecked?.(next);
+    };
+    const lookup = getZipLookup();
+    if (lookup || !isValidZip(value)) {
+      apply(checkZip(value, lookup));
+      return;
+    }
+    void loadZipLookup().then((loaded) => {
+      if (latestCheck.current === value) apply(checkZip(value, loaded));
+    });
+  }
+
+  function preloadZipList() {
+    void loadZipLookup();
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -90,7 +125,14 @@ export function ZipChecker({
           {heading}
         </label>
       ) : null}
-      <form className="bb-zip__form" onSubmit={handleSubmit} noValidate>
+      <form
+        className="bb-zip__form"
+        onSubmit={handleSubmit}
+        onFocus={preloadZipList}
+        onPointerEnter={preloadZipList}
+        onTouchStart={preloadZipList}
+        noValidate
+      >
         {inline ? null : (
           <label htmlFor={inputId} className="visually-hidden">
             Enter your 5-digit zip code
@@ -112,8 +154,15 @@ export function ZipChecker({
             setZip(value);
             // Instant result once 5 digits are in.
             if (value.length === 5 && value !== zip) {
-              runCheck(value);
-              if (inFlow && findServiceZip(value)) event.target.blur();
+              const input = event.target;
+              runCheck(value, (next) => {
+                if (
+                  inFlow &&
+                  (next.status === 'served' || next.status === 'coming-soon')
+                ) {
+                  input.blur();
+                }
+              });
             }
           }}
         />
@@ -217,11 +266,14 @@ function InlineResult({result}: {result: Result}) {
   }
 }
 
-function checkZip(raw: string): Result {
+function checkZip(raw: string, lookup: ZipLookup | null): Result {
   const value = raw.trim();
   if (!value) return {status: 'idle'};
   if (!isValidZip(value)) return {status: 'invalid'};
-  const match = findServiceZip(value);
+  // Only reached before the zip list loads for a pre-filled zip (see the
+  // effect in ZipChecker); the result follows once it arrives.
+  if (!lookup) return {status: 'idle'};
+  const match = lookup(value);
   if (!match) return {status: 'unserved', zip: value};
   return isServedZip(match)
     ? {status: 'served', match}

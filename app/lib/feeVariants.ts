@@ -1,4 +1,4 @@
-import type {Storefront} from '@shopify/hydrogen';
+import type {CachingStrategy, Storefront} from '@shopify/hydrogen';
 import {PRODUCT_PRICING, type ProductKind} from '~/config/pricing';
 
 /** A fee product's variant, for the required add-ons / fees step. */
@@ -33,15 +33,18 @@ const FEE_VARIANTS_QUERY = `#graphql
 /**
  * Loads the Large Electronic Device and Mattress / Box Spring fee variants.
  * Never throws: a missing fee product just isn't offered in the step.
+ * `cache` defaults to Hydrogen's standard short cache.
  */
 export async function loadFeeVariants(
   storefront: Storefront,
+  cache?: CachingStrategy,
 ): Promise<FeeVariant[]> {
   const electronics = PRODUCT_PRICING['electronics-addon'];
   const mattress = PRODUCT_PRICING['mattress-addon'];
   try {
     const data = await storefront.query(FEE_VARIANTS_QUERY, {
       variables: {electronics: electronics.handle, mattress: mattress.handle},
+      cache,
     });
     const result: FeeVariant[] = [];
     const e = data.electronics?.selectedOrFirstAvailableVariant;

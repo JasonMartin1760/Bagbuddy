@@ -1263,6 +1263,12 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   width: 100%;
 }
 
+/* The placeholder logo sits in a <picture> (AVIF/WebP/PNG); keep the img
+   laid out as the flex item exactly as before. */
+.bb-product-card__placeholder picture {
+  display: contents;
+}
+
 .bb-product-card__title {
   color: var(--bb-purple);
   font-size: 1.25rem;

@@ -1,9 +1,16 @@
-import {useRef, useState} from 'react';
+import {lazy, Suspense, useEffect, useRef, useState} from 'react';
 import type {OptimisticCartLineInput} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {formatUsd} from '~/config/pricing';
-import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
+
+// The optional zip check only shows inside the bag sheet, so its code loads
+// after the page is up (or when the sheet opens), not with the page.
+const ZipChecker = lazy(() =>
+  import('~/components/bagbuddy/ZipChecker').then((m) => ({
+    default: m.ZipChecker,
+  })),
+);
 
 const MAX_BAGS = 10;
 const ALLOWED_ID = 'allowed';
@@ -33,9 +40,23 @@ export function BagBuyBox({
   const [quantity, setQuantity] = useState(1);
   const [mode, setMode] = useState<'checkout' | 'cart'>('checkout');
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [showZip, setShowZip] = useState(false);
+
+  // Mount the (hidden) zip check once the page is idle after load.
+  useEffect(() => {
+    if (showZip) return;
+    const show = () => setShowZip(true);
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(show, {timeout: 3000});
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(show, 1);
+    return () => clearTimeout(id);
+  }, [showZip]);
 
   function openStep(next: 'checkout' | 'cart') {
     setMode(next);
+    setShowZip(true);
     dialogRef.current?.showModal();
   }
   const available = !!variant?.availableForSale;
@@ -128,10 +149,14 @@ export function BagBuyBox({
           >
             {mode === 'checkout' ? 'Skip to checkout' : 'Skip and add to cart'}
           </AddToCartButton>
-          <ZipChecker
-            heading="Want to make sure we serve your area before buying a bag?"
-            variant="inline"
-          />
+          {showZip ? (
+            <Suspense fallback={null}>
+              <ZipChecker
+                heading="Want to make sure we serve your area before buying a bag?"
+                variant="inline"
+              />
+            </Suspense>
+          ) : null}
           <p className="bb-bag-sheet__note">
             Some items have extra disposal charges, such as mattresses and large
             electronics.
