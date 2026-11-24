@@ -13,6 +13,7 @@ export function AddToCartButton({
   lines,
   onClick,
   pendingLabel = 'Adding…',
+  redirectToCheckout = false,
 }: {
   analytics?: unknown;
   children: React.ReactNode;
@@ -21,6 +22,8 @@ export function AddToCartButton({
   lines: Array<OptimisticCartLineInput>;
   onClick?: () => void;
   pendingLabel?: string;
+  /** After adding, go straight to Shopify checkout (see routes/cart.tsx). */
+  redirectToCheckout?: boolean;
 }) {
   return (
     <CartForm route="/cart" inputs={{lines}} action={CartForm.ACTIONS.LinesAdd}>
@@ -34,6 +37,9 @@ export function AddToCartButton({
               type="hidden"
               value={JSON.stringify(analytics)}
             />
+            {redirectToCheckout ? (
+              <input type="hidden" name="redirectTo" value="checkout" />
+            ) : null}
             <button
               className={className}
               type="submit"

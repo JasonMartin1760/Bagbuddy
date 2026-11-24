@@ -1,35 +1,55 @@
-import {useEffect, useId, useRef, useState} from 'react';
+import {useId, useRef, useState} from 'react';
 import type {OptimisticCartLineInput} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
-import {ADDITIONAL_FEES, formatUsd, type ProductKind} from '~/config/pricing';
+import {ADDITIONAL_FEES, formatUsd} from '~/config/pricing';
+import type {FeeVariant} from '~/lib/feeVariants';
 
-type BagVariant = OptimisticCartLineInput['selectedVariant'] & {
+export type {FeeVariant};
+
+type MainVariant = {
   id: string;
   availableForSale: boolean;
+  selectedVariant?: OptimisticCartLineInput['selectedVariant'];
 };
-
-export interface FeeVariant {
-  kind: ProductKind;
-  id: string;
-  availableForSale: boolean;
-}
 
 const MAX_PER_FEE = 10;
 
 /**
- * Buying a bag is a two-step flow: "Add to cart" opens a required fees step
- * that lists the additional item charges (large electronic devices,
- * mattresses / box springs). The shopper can add the fee items there and
- * must tick "I understand" before the bag goes into the cart, so the fees
- * step can't be skipped.
+ * Required add-ons step for buying a bag or scheduling a pickup. The main
+ * button opens a step that lists the additional item charges (large
+ * electronic devices, mattresses / box springs) with quantities. The
+ * shopper must tick "I understand" before anything goes into the cart, so
+ * the step can't be skipped. The chosen fees are added to the cart as real
+ * line items together with the bag or pickup.
+ *
+ * - `goTo="cart"`: adds the lines and opens the cart drawer.
+ * - `goTo="checkout"`: adds the lines and sends the shopper straight to
+ *   Shopify checkout (pickup landing page).
  */
-export function BagPurchaseForm({
-  bagVariant,
+export function FeesStepPurchase({
+  mainVariant,
   feeVariants,
+  mainAttributeKey,
+  startLabel,
+  submitLabel,
+  submittingLabel,
+  intro,
+  note,
+  goTo = 'cart',
+  startClassName = 'bb-btn bb-btn--yellow bb-btn--lg bb-buy__start',
 }: {
-  bagVariant: BagVariant | null | undefined;
+  mainVariant: MainVariant | null | undefined;
   feeVariants: readonly FeeVariant[];
+  /** Line attribute recorded on the bag / pickup line once fees are reviewed. */
+  mainAttributeKey: string;
+  startLabel: string;
+  submitLabel: string;
+  submittingLabel?: string;
+  intro: string;
+  note?: string;
+  goTo?: 'cart' | 'checkout';
+  startClassName?: string;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -38,17 +58,9 @@ export function BagPurchaseForm({
   const [acknowledged, setAcknowledged] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
-  const available = !!bagVariant?.availableForSale;
+  const available = !!mainVariant?.availableForSale;
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const reset = () => setAcknowledged(false);
-    dialog.addEventListener('close', reset);
-    return () => dialog.removeEventListener('close', reset);
-  }, []);
-
-  function openFeesStep() {
+  function openStep() {
     setAcknowledged(false);
     dialogRef.current?.showModal();
   }
@@ -60,13 +72,15 @@ export function BagPurchaseForm({
     }));
   }
 
-  const lines: OptimisticCartLineInput[] = bagVariant
+  const lines: OptimisticCartLineInput[] = mainVariant
     ? [
         {
-          merchandiseId: bagVariant.id,
+          merchandiseId: mainVariant.id,
           quantity: 1,
-          selectedVariant: bagVariant,
-          attributes: [{key: 'Additional fees reviewed', value: 'Yes'}],
+          ...(mainVariant.selectedVariant
+            ? {selectedVariant: mainVariant.selectedVariant}
+            : {}),
+          attributes: [{key: mainAttributeKey, value: 'Yes'}],
         },
         ...feeVariants
           .filter((fee) => (quantities[fee.id] ?? 0) > 0)
@@ -81,30 +95,26 @@ export function BagPurchaseForm({
     <div className="product-form bb-buy">
       <button
         type="button"
-        className="bb-btn bb-btn--yellow bb-btn--lg bb-buy__start"
+        className={startClassName}
         disabled={!available}
-        onClick={openFeesStep}
+        onClick={openStep}
       >
-        {available ? 'Add to cart' : 'Sold out'}
+        {available ? startLabel : 'Not available right now'}
       </button>
-      <p className="bb-buy__note">
-        Next: review the additional item charges before your bag is added.
-      </p>
+      {note ? <p className="bb-buy__note">{note}</p> : null}
 
       <dialog
         ref={dialogRef}
         className="bb-fees-step"
         aria-labelledby={titleId}
+        onClose={() => setAcknowledged(false)}
       >
         <div className="bb-fees-step__inner">
           <p className="bb-fees-step__eyebrow">Step 2 of 2</p>
           <h2 id={titleId} className="bb-fees-step__title">
             Additional item charges
           </h2>
-          <p>
-            Some items cost extra to dispose of. If any of these will go in your
-            bag, add one fee for each item now.
-          </p>
+          <p>{intro}</p>
           <ul className="bb-fees-step__list">
             {ADDITIONAL_FEES.map((fee) => {
               const variant = feeVariants.find((v) => v.kind === fee.kind);
@@ -164,12 +174,19 @@ export function BagPurchaseForm({
               className="bb-btn bb-btn--yellow bb-btn--lg"
               disabled={!acknowledged || !available}
               lines={lines}
+              redirectToCheckout={goTo === 'checkout'}
+              pendingLabel={
+                submittingLabel ??
+                (goTo === 'checkout' ? 'Sending you to checkout…' : 'Adding…')
+              }
               onClick={() => {
-                dialogRef.current?.close();
-                open('cart');
+                if (goTo === 'cart') {
+                  dialogRef.current?.close();
+                  open('cart');
+                }
               }}
             >
-              Add to cart
+              {submitLabel}
             </AddToCartButton>
             <button
               type="button"

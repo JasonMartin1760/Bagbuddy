@@ -4,8 +4,8 @@ import {ZipChecker} from '~/components/bagbuddy/ZipChecker';
 import {ServiceMap} from '~/components/bagbuddy/ServiceMap';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
 import {BulletList, FeeList} from '~/components/bagbuddy/InfoBlocks';
-import {AddToCartButton} from '~/components/AddToCartButton';
-import {useAside} from '~/components/Aside';
+import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
+import {loadFeeVariants} from '~/lib/feeVariants';
 import {BUY_BAG_PATH, SITE} from '~/config/site';
 import {HOW_FULL, PLACEMENT} from '~/data/content';
 import {
@@ -42,6 +42,7 @@ const PICKUP_VARIANTS_QUERY = `#graphql
 
 /** Pickup product variants, so a served zip can add its pickup to the cart. */
 export async function loader({context}: Route.LoaderArgs) {
+  const feeVariantsPromise = loadFeeVariants(context.storefront);
   const springs = PRODUCT_PRICING['pickup-colorado-springs'];
   const woodland = PRODUCT_PRICING['pickup-woodland-park'];
   const variants: Record<string, {id: string; availableForSale: boolean}> = {};
@@ -56,7 +57,7 @@ export async function loader({context}: Route.LoaderArgs) {
   } catch (error) {
     console.error(error);
   }
-  return {variants};
+  return {variants, feeVariants: await feeVariantsPromise};
 }
 
 export const meta: Route.MetaFunction = () => {
@@ -78,8 +79,7 @@ export const meta: Route.MetaFunction = () => {
  * phone or email is always available.
  */
 export default function BookPickup() {
-  const {variants} = useLoaderData<typeof loader>();
-  const {open} = useAside();
+  const {variants, feeVariants} = useLoaderData<typeof loader>();
   const [params] = useSearchParams();
   const initialZip = (params.get('zip') ?? '').replace(/\D/g, '').slice(0, 5);
   const [match, setMatch] = useState<ServiceZip | null>(
@@ -132,13 +132,16 @@ export default function BookPickup() {
                   </p>
                 ) : null}
                 {pickupVariant?.availableForSale ? (
-                  <AddToCartButton
-                    className="bb-btn bb-btn--yellow bb-btn--lg"
-                    lines={[{merchandiseId: pickupVariant.id, quantity: 1}]}
-                    onClick={() => open('cart')}
-                  >
-                    Add pickup to cart
-                  </AddToCartButton>
+                  <FeesStepPurchase
+                    key={pickup.handle}
+                    mainVariant={pickupVariant}
+                    feeVariants={feeVariants}
+                    mainAttributeKey="Add-on items reviewed"
+                    startLabel="Add pickup to cart"
+                    submitLabel="Add pickup to cart"
+                    intro="Some items cost extra to dispose of. If any of these are in the bag we're picking up, add one fee for each item now."
+                    note="Next: add any extra-cost items in your bag before checkout."
+                  />
                 ) : (
                   <Link
                     className="bb-btn bb-btn--yellow bb-btn--lg"

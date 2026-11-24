@@ -15,10 +15,8 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import type {ProductFragment} from 'storefrontapi.generated';
 import {ProductPlaceholderImage} from '~/components/ProductItem';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
-import {
-  BagPurchaseForm,
-  type FeeVariant,
-} from '~/components/bagbuddy/BagPurchase';
+import {FeesStepPurchase} from '~/components/bagbuddy/FeesStep';
+import {loadFeeVariants, type FeeVariant} from '~/lib/feeVariants';
 import {
   AllowedLists,
   BulletList,
@@ -97,9 +95,10 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  // The bag's required fees step needs the fee products' variants.
+  // The bag's and pickups' required add-ons step needs the fee variants.
+  const kind = findProductPricing(product)?.kind;
   const feeVariants =
-    findProductPricing(product)?.kind === 'dumpster-bag'
+    kind && (kind === 'dumpster-bag' || isPickupKind(kind))
       ? await loadFeeVariants(storefront)
       : [];
 
@@ -108,39 +107,6 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     planned: null,
     feeVariants,
   };
-}
-
-async function loadFeeVariants(
-  storefront: Route.LoaderArgs['context']['storefront'],
-): Promise<FeeVariant[]> {
-  const electronics = PRODUCT_PRICING['electronics-addon'];
-  const mattress = PRODUCT_PRICING['mattress-addon'];
-  try {
-    const data = await storefront.query(FEE_VARIANTS_QUERY, {
-      variables: {electronics: electronics.handle, mattress: mattress.handle},
-    });
-    const result: FeeVariant[] = [];
-    const e = data.electronics?.selectedOrFirstAvailableVariant;
-    if (e) {
-      result.push({
-        kind: electronics.kind,
-        id: e.id,
-        availableForSale: e.availableForSale,
-      });
-    }
-    const m = data.mattress?.selectedOrFirstAvailableVariant;
-    if (m) {
-      result.push({
-        kind: mattress.kind,
-        id: m.id,
-        availableForSale: m.availableForSale,
-      });
-    }
-    return result;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
 }
 
 /**
@@ -220,9 +186,24 @@ function ShopifyProduct({
             ))}
           </ul>
           {pricing?.kind === 'dumpster-bag' ? (
-            <BagPurchaseForm
-              bagVariant={selectedVariant}
+            <FeesStepPurchase
+              mainVariant={{...selectedVariant, selectedVariant}}
               feeVariants={feeVariants}
+              mainAttributeKey="Additional fees reviewed"
+              startLabel="Add to cart"
+              submitLabel="Add to cart"
+              intro="Some items cost extra to dispose of. If any of these will go in your bag, add one fee for each item now."
+              note="Next: review the additional item charges before your bag is added."
+            />
+          ) : pricing && isPickupKind(pricing.kind) ? (
+            <FeesStepPurchase
+              mainVariant={{...selectedVariant, selectedVariant}}
+              feeVariants={feeVariants}
+              mainAttributeKey="Add-on items reviewed"
+              startLabel="Add pickup to cart"
+              submitLabel="Add pickup to cart"
+              intro="Some items cost extra to dispose of. If any of these are in the bag we're picking up, add one fee for each item now."
+              note="Next: add any extra-cost items in your bag before checkout."
             />
           ) : (
             <ProductForm
@@ -453,28 +434,6 @@ const PRODUCT_FRAGMENT = `#graphql
     }
   }
   ${PRODUCT_VARIANT_FRAGMENT}
-` as const;
-
-const FEE_VARIANTS_QUERY = `#graphql
-  query BagFeeVariants(
-    $country: CountryCode
-    $language: LanguageCode
-    $electronics: String!
-    $mattress: String!
-  ) @inContext(country: $country, language: $language) {
-    electronics: product(handle: $electronics) {
-      selectedOrFirstAvailableVariant {
-        id
-        availableForSale
-      }
-    }
-    mattress: product(handle: $mattress) {
-      selectedOrFirstAvailableVariant {
-        id
-        availableForSale
-      }
-    }
-  }
 ` as const;
 
 const PRODUCT_QUERY = `#graphql
