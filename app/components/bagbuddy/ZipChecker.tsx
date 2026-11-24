@@ -10,7 +10,6 @@ import {
 import {
   LOWEST_PICKUP_PRICE,
   PICKUP_STARTING_PRICE,
-  PRODUCT_PRICING,
   formatUsd,
 } from '~/config/pricing';
 import {CallButton} from '~/components/bagbuddy/ContactButton';
@@ -101,24 +100,14 @@ export function ZipChecker({
 }
 
 /**
- * Starting prices under the heading. Pickup is "starting at" the lowest
- * area price (Colorado Springs $130; Woodland Park is $150).
+ * Starting pickup price under the heading: "starting at" the lowest area
+ * price (Colorado Springs $130; Woodland Park is $150).
  */
 function PriceNote() {
-  const bag = PRODUCT_PRICING['dumpster-bag'].price;
-  if (LOWEST_PICKUP_PRICE === null && bag === null) return null;
+  if (LOWEST_PICKUP_PRICE === null) return null;
   return (
     <p className="bb-zip__prices">
-      {LOWEST_PICKUP_PRICE !== null ? (
-        <span className="bb-zip__price-pill">
-          Pickup starting at <strong>{formatUsd(LOWEST_PICKUP_PRICE)}</strong>
-        </span>
-      ) : null}
-      {bag !== null ? (
-        <span className="bb-zip__price-pill">
-          Dumpster bags <strong>{formatUsd(bag)}</strong>
-        </span>
-      ) : null}
+      Pickup starting at {formatUsd(LOWEST_PICKUP_PRICE)}
     </p>
   );
 }
