@@ -2,20 +2,11 @@ import {redirect} from 'react-router';
 import type {Route} from './+types/discount.$code';
 
 /**
- * Automatically applies a discount found on the url
- * If a cart exists it's updated with the discount, otherwise a cart is created with the discount already applied
- *
- * @example
- * Example path applying a discount and optional redirecting (defaults to the home page)
- * ```js
- * /discount/FREESHIPPING?redirect=/products
- *
- * ```
+ * Discount links (/discount/CODE) are turned off for Bag Buddy (Jason's
+ * call: no discount codes). The link still works as a redirect so old URLs
+ * don't 404, but no code is applied to the cart.
  */
-export async function loader({request, context, params}: Route.LoaderArgs) {
-  const {cart} = context;
-  const {code} = params;
-
+export function loader({request}: Route.LoaderArgs) {
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
   let redirectParam =
@@ -26,23 +17,5 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
     redirectParam = '/';
   }
 
-  searchParams.delete('redirect');
-  searchParams.delete('return_to');
-
-  const redirectUrl = `${redirectParam}?${searchParams}`;
-
-  if (!code) {
-    return redirect(redirectUrl);
-  }
-
-  const result = await cart.updateDiscountCodes([code]);
-  const headers = cart.setCartId(result.cart.id);
-
-  // Using set-cookie on a 303 redirect will not work if the domain origin have port number (:3000)
-  // If there is no cart id and a new cart id is created in the progress, it will not be set in the cookie
-  // on localhost:3000
-  return redirect(redirectUrl, {
-    status: 303,
-    headers,
-  });
+  return redirect(redirectParam);
 }

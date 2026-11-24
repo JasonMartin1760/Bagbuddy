@@ -1,171 +1,377 @@
-import {
-  Await,
-  useLoaderData,
-  Link,
-} from 'react-router';
+import {useState} from 'react';
+import {Link} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense} from 'react';
-import {Image} from '@shopify/hydrogen';
-import type {
-  FeaturedCollectionFragment,
-  RecommendedProductsQuery,
-} from 'storefrontapi.generated';
-import {ProductItem} from '~/components/ProductItem';
+import {ServiceMap} from '~/components/bagbuddy/ServiceMap';
+import {ContactSheet} from '~/components/ContactSheet';
+import {ZipChecker, isServedZip} from '~/components/bagbuddy/ZipChecker';
+import type {ServiceZip} from '~/data/serviceAreas';
+import {
+  AllowedLists,
+  BulletList,
+  FeeList,
+} from '~/components/bagbuddy/InfoBlocks';
+import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
+import {TESTIMONIALS} from '~/config/testimonials';
+import {
+  LOWEST_PICKUP_PRICE,
+  PRODUCT_PRICING,
+  formatUsd,
+} from '~/config/pricing';
+import {
+  ABOUT,
+  ALLOWED,
+  HOW_FULL,
+  HOW_IT_WORKS,
+  PLACEMENT,
+  WHY_DUMPSTER_BAG,
+} from '~/data/content';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Hydrogen | Home'}];
+  return [
+    {title: `${SITE.name} | Dumpster bags and pickup in Colorado`},
+    {
+      name: 'description',
+      content:
+        'Buy a dumpster bag, fill it on your own time and book a pickup. Serving Colorado Springs (El Paso County) and Woodland Park (Teller County).',
+    },
+  ];
 };
 
-export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
-  return {...deferredData, ...criticalData};
-}
-
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
-async function loadCriticalData({context}: Route.LoaderArgs) {
-  const [{collections}] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTION_QUERY),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
-
-  return {
-    featuredCollection: collections.nodes[0],
-  };
-}
-
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({context}: Route.LoaderArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
-    .catch((error: Error) => {
-      // Log query errors, but don't throw them so the page can still render
-      console.error(error);
-      return null;
-    });
-
-  return {
-    recommendedProducts,
-  };
-}
-
 export default function Homepage() {
-  const data = useLoaderData<typeof loader>();
-  return (
-    <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
-    </div>
-  );
-}
+  // Main zip check lives in the pickup flow (/book-pickup, step 1); the
+  // compact checker under the map highlights the matched area here.
+  const bookHref = BOOK_PICKUP_PATH;
+  const [match, setMatch] = useState<ServiceZip | null>(null);
+  const matchedArea = isServedZip(match) ? match.area : null;
+  const bag = PRODUCT_PRICING['dumpster-bag'];
 
-function FeaturedCollection({
-  collection,
-}: {
-  collection: FeaturedCollectionFragment;
-}) {
-  if (!collection) return null;
-  const image = collection?.image;
+  const hero = SITE.heroImage;
+
   return (
-    <Link
-      className="featured-collection"
-      to={`/collections/${collection.handle}`}
-    >
-      {image && (
-        <div className="featured-collection-image">
-          <Image data={image} sizes="100vw" />
+    <div className="bb-home">
+      {/* Hero: heading, starting price and the two main buttons, then the map. */}
+      {/* TODO(Jason): swap the placeholder for the truck photo in app/config/site.ts. */}
+      <section
+        className={hero.src ? 'bb-hero bb-hero--photo' : 'bb-hero'}
+        aria-labelledby="hero-title"
+      >
+        {hero.src ? (
+          <picture className="bb-hero__bg">
+            {hero.avifSrc ? (
+              <source srcSet={hero.avifSrc} type="image/avif" />
+            ) : null}
+            <source
+              srcSet={hero.src}
+              type={hero.src.endsWith('.webp') ? 'image/webp' : undefined}
+            />
+            <img
+              src={hero.fallbackSrc ?? hero.src}
+              alt={hero.alt}
+              width={1600}
+              height={762}
+              fetchPriority="high"
+            />
+          </picture>
+        ) : null}
+        <div className="bb-hero__inner">
+          <div className="bb-hero__intro">
+            <h1 id="hero-title" className="bb-hero__title">
+              <span className="bb-hero__title-main">Dumpster bags.</span>{' '}
+              <span className="bb-hero__title-sub">
+                When you need it, where you need it.
+              </span>
+            </h1>
+            {LOWEST_PICKUP_PRICE !== null ? (
+              <p className="bb-hero__price">
+                Pickup starting at {formatUsd(LOWEST_PICKUP_PRICE)}
+              </p>
+            ) : null}
+          </div>
+          <div className="bb-hero__ctas">
+            <Link
+              className="bb-btn bb-btn--yellow bb-btn--lg"
+              to={BUY_BAG_PATH}
+            >
+              Buy a Dumpster Bag
+            </Link>
+            <Link
+              className="bb-btn bb-btn--outline-light bb-btn--lg"
+              to={bookHref}
+            >
+              Schedule Bag Pickup
+            </Link>
+          </div>
+          <div className="bb-hero__map">
+            <ServiceMap
+              highlightedArea={matchedArea}
+              footer={
+                <ZipChecker
+                  heading="Check if we serve your zip code"
+                  headingLevel="h2"
+                  variant="banner"
+                  onAreaChange={setMatch}
+                />
+              }
+            />
+          </div>
         </div>
-      )}
-      <h1>{collection.title}</h1>
-    </Link>
-  );
-}
+      </section>
 
-function RecommendedProducts({
-  products,
-}: {
-  products: Promise<RecommendedProductsQuery | null>;
-}) {
-  return (
-    <div className="recommended-products">
-      <h2>Recommended Products</h2>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={products}>
-          {(response) => (
-            <div className="recommended-products-grid">
-              {response
-                ? response.products.nodes.map((product) => (
-                    <ProductItem key={product.id} product={product} />
-                  ))
-                : null}
-            </div>
-          )}
-        </Await>
-      </Suspense>
-      <br />
+      <section
+        className="bb-section bb-section--purple"
+        aria-labelledby="how-title"
+      >
+        <div className="bb-container">
+          <h2 id="how-title" className="bb-section__title">
+            How It Works
+          </h2>
+          <ol className="bb-steps">
+            {HOW_IT_WORKS.map((step, index) => (
+              <li key={step.title} className="bb-step">
+                <span className="bb-step__num" aria-hidden="true">
+                  {index + 1}
+                </span>
+                {index === 2 ? <TruckPhoto className="bb-step__photo" /> : null}
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+                {index === 0 && bag.price !== null ? (
+                  <p className="bb-step__price">
+                    {formatUsd(bag.price)} <small>{bag.unit}</small>
+                  </p>
+                ) : null}
+                {index === 0 ? (
+                  <Link className="bb-step__link" to={BUY_BAG_PATH}>
+                    Buy a bag →
+                  </Link>
+                ) : null}
+                {index === 2 ? (
+                  <Link className="bb-step__link" to={bookHref}>
+                    Schedule bag pickup →
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Same band as the ads landing page: Call / Text / Email sheet. */}
+      <section className="bb-specific-day" aria-labelledby="specific-day-title">
+        <div className="bb-container bb-specific-day__inner">
+          <div>
+            <h2 id="specific-day-title" className="bb-specific-day__title">
+              Need a specific day?
+            </h2>
+            <p>Just ask. We&rsquo;ll do our best to work with your schedule.</p>
+          </div>
+          <ContactSheet
+            label="Contact"
+            buttonClassName="bb-btn bb-specific-day__btn bb-specific-day__btn--small"
+            title="How would you like to reach us?"
+          />
+        </div>
+      </section>
+
+      <section
+        className="bb-section"
+        id="allowed"
+        aria-labelledby="allowed-title"
+      >
+        <div className="bb-container">
+          <h2 id="allowed-title" className="bb-section__title">
+            {ALLOWED.title}
+          </h2>
+          <p className="bb-section__intro">{ALLOWED.intro}</p>
+          <AllowedLists />
+        </div>
+      </section>
+
+      <section
+        className="bb-section bb-section--tint"
+        id="placement"
+        aria-labelledby="place-title"
+      >
+        <div className="bb-container">
+          <h2 id="place-title" className="bb-section__title">
+            {PLACEMENT.title}
+          </h2>
+          <BulletList items={PLACEMENT.points} />
+        </div>
+      </section>
+
+      <section className="bb-section" aria-labelledby="full-title">
+        <div className="bb-container bb-split">
+          <div>
+            <h2 id="full-title" className="bb-section__title">
+              {HOW_FULL.title}
+            </h2>
+            <BulletList items={HOW_FULL.points} />
+          </div>
+          <FeeList />
+        </div>
+      </section>
+
+      <section
+        className="bb-section bb-section--tint"
+        id="why-dumpster-bag"
+        aria-labelledby="why-title"
+      >
+        <div className="bb-container bb-narrow">
+          <h2 id="why-title" className="bb-section__title">
+            {WHY_DUMPSTER_BAG.title}
+          </h2>
+          <p className="bb-section__intro">{WHY_DUMPSTER_BAG.intro}</p>
+          <BulletList items={WHY_DUMPSTER_BAG.points} />
+        </div>
+      </section>
+
+      {/* Trust bar (PDF) renders once SITE.googleRating is set. */}
+      <TrustBar />
+      <Testimonials />
+
+      <section className="bb-section" id="about" aria-labelledby="about-title">
+        <div className="bb-container bb-about">
+          <h2 id="about-title" className="bb-section__title">
+            {ABOUT.title}
+          </h2>
+          <div className="bb-about__story">
+            {ABOUT.paragraphs.map((paragraph) => (
+              <p key={paragraph} className="bb-lead bb-about__text">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          <AboutSignature />
+          <TruckPhoto className="bb-about__photo" />
+          <div className="bb-cta-row bb-about__cta">
+            <Link
+              className="bb-btn bb-btn--purple bb-btn--lg"
+              to={BUY_BAG_PATH}
+            >
+              Buy a Dumpster Bag Now
+            </Link>
+            <Link className="bb-btn bb-btn--outline bb-btn--lg" to={bookHref}>
+              Schedule Bag Pickup
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
 
-const FEATURED_COLLECTION_QUERY = `#graphql
-  fragment FeaturedCollection on Collection {
-    id
-    title
-    image {
-      id
-      url
-      altText
-      width
-      height
-    }
-    handle
-  }
-  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...FeaturedCollection
-      }
-    }
-  }
-` as const;
+/** Google rating trust bar. Hidden until SITE.googleRating is set. */
+function TrustBar() {
+  if (SITE.googleRating === null) return null;
+  const stars = '★★★★★';
+  const content = (
+    <>
+      <span className="bb-trust__stars" aria-hidden="true">
+        {stars}
+      </span>
+      <span>
+        <strong>{SITE.googleRating.toFixed(1)}/5</strong> stars on Google
+        {SITE.googleReviewCount !== null
+          ? ` from ${SITE.googleReviewCount} reviews`
+          : ''}
+      </span>
+    </>
+  );
+  return (
+    <section className="bb-trust" aria-label="Google reviews">
+      {SITE.googleReviewsUrl ? (
+        <a
+          href={SITE.googleReviewsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {content}
+        </a>
+      ) : (
+        <p>{content}</p>
+      )}
+    </section>
+  );
+}
 
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
-    id
-    title
-    handle
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    featuredImage {
-      id
-      url
-      altText
-      width
-      height
-    }
-  }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...RecommendedProduct
-      }
-    }
-  }
-` as const;
+/** Customer quotes, shown in the trust bar's spot on the homepage. */
+function Testimonials() {
+  if (TESTIMONIALS.items.length === 0) return null;
+  return (
+    <section
+      className="bb-section bb-testimonials"
+      aria-labelledby="testimonials-title"
+    >
+      <div className="bb-container">
+        <h2 id="testimonials-title" className="bb-testimonials__title">
+          What customers say
+        </h2>
+        <ul className="bb-testimonials__grid">
+          {TESTIMONIALS.items.map((item) => (
+            <li key={item.name} className="bb-testimonial">
+              <figure>
+                <blockquote>
+                  <p>&ldquo;{item.quote}&rdquo;</p>
+                </blockquote>
+                <figcaption>— {item.name}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+        {TESTIMONIALS.placeholder ? (
+          <p className="bb-muted bb-testimonials__note">
+            Sample reviews. Real customer reviews coming soon.
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/** Jason's truck photo; below the fold, so it lazy-loads. */
+function TruckPhoto({className}: {className: string}) {
+  const img = SITE.truckImage;
+  return (
+    <picture className={className}>
+      {img.avifSrc ? <source srcSet={img.avifSrc} type="image/avif" /> : null}
+      <source srcSet={img.src} type="image/webp" />
+      <img
+        src={img.fallbackSrc}
+        alt={img.alt}
+        width={img.width}
+        height={img.height}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  );
+}
+
+/**
+ * Sign-off under Jason's story. Shows his photo beside it once
+ * SITE.ownerPhoto is set; until then it's just the name line (no empty box).
+ */
+function AboutSignature() {
+  const photo = SITE.ownerPhoto;
+  return (
+    <p className="bb-about__signature">
+      {photo ? (
+        <picture className="bb-about__avatar">
+          <source srcSet={photo.src} type="image/webp" />
+          <img
+            src={photo.fallbackSrc}
+            alt={photo.alt}
+            width={64}
+            height={64}
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      ) : null}
+      <span>
+        <span aria-hidden="true">— </span>
+        {ABOUT.signature}
+      </span>
+    </p>
+  );
+}

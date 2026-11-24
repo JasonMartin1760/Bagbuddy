@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router';
+import {Await, Link, NavLink, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -7,6 +7,8 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {CallButton} from '~/components/bagbuddy/ContactButton';
+import {NAV_ITEMS, SITE} from '~/config/site';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -17,100 +19,79 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-export function Header({
-  header,
-  isLoggedIn,
-  cart,
-  publicStoreDomain,
-}: HeaderProps) {
-  const {shop, menu} = header;
+/**
+ * Site-wide header (Jason's layout):
+ * - row 1: the full logo (with its baked-in tagline), centered
+ * - row 2: phone number on the left, cart + menu side by side on the right;
+ *   on desktop the nav links sit in the middle of this row
+ */
+export function Header({cart}: HeaderProps) {
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
-      </NavLink>
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+    <header className="header bb-header">
+      <Link prefetch="intent" to="/" className="bb-header__logo">
+        <picture>
+          <source srcSet="/images/bagbuddy-logo-color.avif" type="image/avif" />
+          <source srcSet="/images/bagbuddy-logo-color.webp" type="image/webp" />
+          <img
+            src="/images/bagbuddy-logo-color.png"
+            alt={`${SITE.name}: ${SITE.tagline}`}
+            width={640}
+            height={305}
+            fetchPriority="high"
+          />
+        </picture>
+      </Link>
+      <CallButton className="bb-header__call" />
+      <HeaderMenu viewport="desktop" />
+      <div className="bb-header__actions">
+        <CartToggle cart={cart} />
+        <HeaderMenuMobileToggle />
+      </div>
     </header>
   );
 }
 
-export function HeaderMenu({
-  menu,
-  primaryDomainUrl,
-  viewport,
-  publicStoreDomain,
-}: {
-  menu: HeaderProps['header']['menu'];
-  primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url'];
-  viewport: Viewport;
-  publicStoreDomain: HeaderProps['publicStoreDomain'];
-}) {
-  const className = `header-menu-${viewport}`;
+/**
+ * Site navigation from app/config/site.ts (Buy Bags, Book a Pickup, the
+ * allowed / placement / why-a-dumpster-bag questions, About, Contact).
+ */
+export function HeaderMenu({viewport}: {viewport: Viewport}) {
   const {close} = useAside();
-
   return (
-    <nav className={className} role="navigation">
+    <nav
+      className={`header-menu-${viewport} bb-nav bb-nav--${viewport}`}
+      aria-label="Main"
+    >
       {viewport === 'mobile' && (
-        <NavLink
-          end
-          onClick={close}
-          prefetch="intent"
-          style={activeLinkStyle}
-          to="/"
-        >
+        <NavLink end onClick={close} prefetch="intent" to="/">
           Home
         </NavLink>
       )}
-      {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
-        if (!item.url) return null;
-
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        return (
-          <NavLink
-            className="header-menu-item"
-            end
-            key={item.id}
-            onClick={close}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
-  );
-}
-
-function HeaderCtas({
-  isLoggedIn,
-  cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
-  return (
-    <nav className="header-ctas" role="navigation">
-      <HeaderMenuMobileToggle />
-      <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
-        <Suspense fallback="Sign in">
-          <Await resolve={isLoggedIn} errorElement="Sign in">
-            {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
-          </Await>
-        </Suspense>
-      </NavLink>
-      <SearchToggle />
-      <CartToggle cart={cart} />
+      {NAV_ITEMS.filter((item) => viewport === 'mobile' || !item.menuOnly).map(
+        (item) =>
+          item.to.includes('#') ? (
+            <Link
+              className="bb-nav__item"
+              key={item.to}
+              onClick={close}
+              to={item.to}
+            >
+              {item.label}
+            </Link>
+          ) : (
+            <NavLink
+              className="bb-nav__item"
+              end
+              key={item.to}
+              onClick={close}
+              prefetch="intent"
+              to={item.to}
+            >
+              {item.label}
+            </NavLink>
+          ),
+      )}
+      {viewport === 'mobile' && <CallButton className="bb-nav__call" />}
     </nav>
   );
 }
@@ -119,19 +100,13 @@ function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
     <button
-      className="header-menu-mobile-toggle reset"
+      className="header-menu-mobile-toggle reset bb-header__menu"
       onClick={() => open('mobile')}
+      aria-label="Open menu"
     >
-      <h3>☰</h3>
-    </button>
-  );
-}
-
-function SearchToggle() {
-  const {open} = useAside();
-  return (
-    <button className="reset" onClick={() => open('search')}>
-      Search
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" />
+      </svg>
     </button>
   );
 }
@@ -143,6 +118,8 @@ function CartBadge({count}: {count: number | null}) {
   return (
     <a
       href="/cart"
+      className="bb-header__cart"
+      aria-label={`Cart${count ? `, ${count} items` : ''}`}
       onClick={(e) => {
         e.preventDefault();
         open('cart');
@@ -154,7 +131,13 @@ function CartBadge({count}: {count: number | null}) {
         } as CartViewPayload);
       }}
     >
-      Cart {count === null ? <span>&nbsp;</span> : count}
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5.2 4l.94 2H21l-3.6 7.2a2 2 0 0 1-1.75 1.05H8.1l-.9 1.65L7.2 16H19v2H7a2 2 0 0 1-1.76-2.95l1.35-2.45L3 4H1V2h3.27z"
+        />
+      </svg>
+      {count ? <span className="bb-header__cart-count">{count}</span> : null}
     </a>
   );
 }
@@ -173,59 +156,4 @@ function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
   return <CartBadge count={cart?.totalQuantity ?? 0} />;
-}
-
-const FALLBACK_HEADER_MENU = {
-  id: 'gid://shopify/Menu/199655587896',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461609500728',
-      resourceId: null,
-      tags: [],
-      title: 'Collections',
-      type: 'HTTP',
-      url: '/collections',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609533496',
-      resourceId: null,
-      tags: [],
-      title: 'Blog',
-      type: 'HTTP',
-      url: '/blogs/journal',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609566264',
-      resourceId: null,
-      tags: [],
-      title: 'Policies',
-      type: 'HTTP',
-      url: '/policies',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461609599032',
-      resourceId: 'gid://shopify/Page/92591030328',
-      tags: [],
-      title: 'About',
-      type: 'PAGE',
-      url: '/pages/about',
-      items: [],
-    },
-  ],
-};
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'black',
-  };
 }

@@ -1,8 +1,4 @@
-import {
-  useLoaderData,
-  data,
-  type HeadersFunction,
-} from 'react-router';
+import {useLoaderData, data, type HeadersFunction} from 'react-router';
 import type {Route} from './+types/cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
@@ -39,17 +35,9 @@ export async function action({request, context}: Route.ActionArgs) {
       result = await cart.removeLines(inputs.lineIds);
       break;
     case CartForm.ACTIONS.DiscountCodesUpdate: {
-      const formDiscountCode = inputs.discountCode;
-
-      // User inputted discount code
-      const discountCodes = (
-        formDiscountCode ? [formDiscountCode] : []
-      ) as string[];
-
-      // Combine discount codes already applied on cart
-      discountCodes.push(...inputs.discountCodes);
-
-      result = await cart.updateDiscountCodes(discountCodes);
+      // Bag Buddy doesn't take discount codes on the storefront (Jason's
+      // call): any update just clears codes from the cart.
+      result = await cart.updateDiscountCodes([]);
       break;
     }
     case CartForm.ACTIONS.GiftCardCodesAdd: {
@@ -82,7 +70,20 @@ export async function action({request, context}: Route.ActionArgs) {
   const {cart: cartResult, errors, warnings} = result;
 
   const redirectTo = formData.get('redirectTo') ?? null;
-  if (typeof redirectTo === 'string') {
+  const checkoutUrl = cartResult?.checkoutUrl;
+  const hasCartErrors = Array.isArray(errors) && errors.length > 0;
+
+  // Buy-now: after adding lines, send the shopper to Shopify checkout
+  // for the updated cart (used by the dumpster-bag pickup landing page).
+  if (
+    redirectTo === 'checkout' &&
+    typeof checkoutUrl === 'string' &&
+    checkoutUrl.length > 0 &&
+    !hasCartErrors
+  ) {
+    status = 303;
+    headers.set('Location', checkoutUrl);
+  } else if (typeof redirectTo === 'string' && redirectTo !== 'checkout') {
     status = 303;
     headers.set('Location', redirectTo);
   }

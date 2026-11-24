@@ -1,129 +1,86 @@
-import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
-import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import {Link} from 'react-router';
+import type {HeaderQuery} from 'storefrontapi.generated';
+import {NAV_ITEMS, SITE, phoneHref} from '~/config/site';
+import {SERVICE_AREAS} from '~/data/serviceAreaList';
 
 interface FooterProps {
-  footer: Promise<FooterQuery | null>;
   header: HeaderQuery;
   publicStoreDomain: string;
 }
 
-export function Footer({
-  footer: footerPromise,
-  header,
-  publicStoreDomain,
-}: FooterProps) {
+/**
+ * Site footer (an addition to the homepage spec): contact details,
+ * service areas and navigation links.
+ */
+export function Footer(_props: FooterProps) {
+  const year = new Date().getFullYear();
   return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {(footer) => (
-          <footer className="footer">
-            {footer?.menu && header.shop.primaryDomain?.url && (
-              <FooterMenu
-                menu={footer.menu}
-                primaryDomainUrl={header.shop.primaryDomain.url}
-                publicStoreDomain={publicStoreDomain}
-              />
+    <footer className="footer bb-footer" id="contact">
+      <div className="bb-footer__inner">
+        <div className="bb-footer__brand">
+          <picture>
+            <source
+              srcSet="/images/bagbuddy-logo-white.avif"
+              type="image/avif"
+            />
+            <source
+              srcSet="/images/bagbuddy-logo-white.webp"
+              type="image/webp"
+            />
+            <img
+              src="/images/bagbuddy-logo-white.png"
+              alt={SITE.name}
+              width={640}
+              height={304}
+              loading="lazy"
+            />
+          </picture>
+          <p>{SITE.tagline}</p>
+        </div>
+        <div>
+          <h2 className="bb-footer__title">Contact</h2>
+          <ul className="bb-footer__list">
+            {SITE.phone ? (
+              <li>
+                <a href={phoneHref(SITE.phone)}>{SITE.phone}</a>
+              </li>
+            ) : null}
+            <li>
+              <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2 className="bb-footer__title">Service areas</h2>
+          <ul className="bb-footer__list">
+            {SERVICE_AREAS.filter((area) => area.status === 'served').map(
+              (area) => (
+                <li key={area.id}>{area.label}, CO</li>
+              ),
             )}
-          </footer>
-        )}
-      </Await>
-    </Suspense>
+          </ul>
+        </div>
+        <div>
+          <h2 className="bb-footer__title">Links</h2>
+          <ul className="bb-footer__list">
+            {NAV_ITEMS.map((item) => (
+              <li key={item.to}>
+                <Link to={item.to} prefetch="intent">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link to="/policies" prefetch="intent">
+                Policies
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p className="bb-footer__legal">
+        © {year} {SITE.name}. All rights reserved.
+      </p>
+    </footer>
   );
-}
-
-function FooterMenu({
-  menu,
-  primaryDomainUrl,
-  publicStoreDomain,
-}: {
-  menu: FooterQuery['menu'];
-  primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
-  publicStoreDomain: string;
-}) {
-  return (
-    <nav className="footer-menu" role="navigation">
-      {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a href={url} key={item.id} rel="noopener noreferrer" target="_blank">
-            {item.title}
-          </a>
-        ) : (
-          <NavLink
-            end
-            key={item.id}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
-  );
-}
-
-const FALLBACK_FOOTER_MENU = {
-  id: 'gid://shopify/Menu/199655620664',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461633060920',
-      resourceId: 'gid://shopify/ShopPolicy/23358046264',
-      tags: [],
-      title: 'Privacy Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/privacy-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633093688',
-      resourceId: 'gid://shopify/ShopPolicy/23358013496',
-      tags: [],
-      title: 'Refund Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/refund-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633126456',
-      resourceId: 'gid://shopify/ShopPolicy/23358111800',
-      tags: [],
-      title: 'Shipping Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/shipping-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633159224',
-      resourceId: 'gid://shopify/ShopPolicy/23358079032',
-      tags: [],
-      title: 'Terms of Service',
-      type: 'SHOP_POLICY',
-      url: '/policies/terms-of-service',
-      items: [],
-    },
-  ],
-};
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'white',
-  };
 }
