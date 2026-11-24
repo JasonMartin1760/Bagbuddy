@@ -27,6 +27,19 @@ export function CallButton({className = ''}: {className?: string}) {
   );
 }
 
+/** Text-message button (sms:) for the business phone. Hidden if no phone. */
+export function TextButton({className = ''}: {className?: string}) {
+  if (!SITE.phone) return null;
+  return (
+    <a
+      className={`bb-btn bb-btn--outline ${className}`}
+      href={`sms:${phoneHref(SITE.phone).replace('tel:', '')}`}
+    >
+      <span>Text us</span>
+    </a>
+  );
+}
+
 function PhoneIcon() {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">

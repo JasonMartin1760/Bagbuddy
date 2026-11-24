@@ -231,26 +231,43 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   width: 100%;
 }
 
-.bb-header__call {
+/* Phone: small outline button so it doesn't compete with the hero buttons. */
+.bb-header__call.bb-btn--call {
+  background: transparent;
+  border: 1.5px solid #d9d1f0;
+  box-shadow: none;
   box-sizing: border-box;
+  color: var(--bb-purple);
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 0.35rem;
   grid-area: call;
   justify-self: start;
-  min-height: 44px;
+  min-height: 40px;
+  padding: 0.35rem 0.8rem;
 }
 
-/* Same font and size as the hero zip-checker heading below it
-   ("Check cost and if we serve your area"), in brand purple. */
+.bb-header__call.bb-btn--call:hover {
+  background: var(--bb-purple-tint);
+  border-color: var(--bb-purple);
+}
+
+.bb-header__call svg {
+  height: 15px;
+  width: 15px;
+}
+
+/* Service line under the phone row, in brand purple (no divider line). */
 .bb-header__service {
-  border-top: 1px solid #ece8f6;
   color: var(--bb-purple);
   font-family: var(--bb-font-heading);
-  font-size: clamp(1.55rem, 6vw, 2.7rem);
+  font-size: clamp(1.3rem, 5vw, 2.2rem);
   font-weight: 400;
   grid-area: service;
   letter-spacing: 0.01em;
   line-height: 1.15;
   margin: 0;
-  padding-top: 0.45rem;
+  padding-top: 0;
   text-align: center;
   text-wrap: balance;
 }
@@ -389,7 +406,7 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   display: grid;
   gap: 1.1rem;
   grid-template-areas:
-    'checker'
+    'intro'
     'ctas'
     'map';
   grid-template-columns: minmax(0, 1fr);
@@ -400,8 +417,24 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
   z-index: 2;
 }
 
-.bb-hero__checker {
-  grid-area: checker;
+.bb-hero__intro {
+  grid-area: intro;
+}
+
+.bb-hero__title {
+  color: #fff;
+  font-size: clamp(1.7rem, 7vw, 2.9rem);
+  line-height: 1.1;
+  margin: 0.25rem 0 0.6rem;
+  text-wrap: balance;
+}
+
+/* "Pickup starting at $130": plain white text. */
+.bb-hero__price {
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
 }
 
 .bb-hero__ctas {
@@ -428,14 +461,18 @@ body > main > :not(.bb-home):not(.bb-page):not(.bb-pdp) {
     align-items: center;
     column-gap: 2.5rem;
     grid-template-areas:
-      'checker map'
-      'ctas ctas';
+      'intro map'
+      'ctas map';
+    grid-template-rows: auto auto;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
+  .bb-hero__intro {
+    align-self: end;
+  }
   .bb-hero__ctas {
-    grid-template-columns: repeat(2, minmax(0, 320px));
-    justify-content: center;
-    margin-top: 0.5rem;
+    align-self: start;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0.75rem;
   }
   .bb-hero__ctas .bb-btn {
     font-size: 1.1rem;
@@ -1414,6 +1451,116 @@ aside header h3 {
 
 .bb-zip__soon-cta {
   margin-top: 0.6rem;
+}
+
+/* Compact zip checker under the homepage map: calm, white on purple. */
+.bb-zip--compact {
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 14px;
+  margin-top: 0.9rem;
+  padding: 0.9rem 1rem 1rem;
+}
+
+.bb-zip--compact .bb-zip__heading {
+  color: #fff;
+  font-size: 1.2rem;
+  margin: 0 0 0.6rem;
+}
+
+.bb-zip--compact .bb-zip__form {
+  max-width: none;
+}
+
+.bb-zip--compact .bb-zip__input {
+  min-height: 46px;
+}
+
+.bb-zip--compact .bb-zip__submit {
+  background: rgb(255 255 255 / 0.12);
+  border-color: #fff;
+  box-shadow: none;
+  color: #fff;
+  min-height: 46px;
+  padding: 0.5rem 1.2rem;
+}
+
+.bb-zip--compact .bb-zip__submit:hover,
+.bb-zip--compact .bb-zip__submit:focus-visible {
+  background: #fff;
+  color: var(--bb-purple);
+}
+
+.bb-zip--compact .bb-zip__msg,
+.bb-zip--compact .bb-zip__msg--success,
+.bb-zip--compact .bb-zip__msg--error,
+.bb-zip--compact .bb-zip__msg--soon {
+  background: rgb(255 255 255 / 0.1);
+  border: 0;
+  border-left: 4px solid rgb(255 255 255 / 0.55);
+  color: #fff;
+  margin-top: 0.75rem;
+}
+
+.bb-zip--compact .bb-zip__served,
+.bb-zip--compact .bb-zip__price,
+.bb-zip--compact .bb-zip__soon-title,
+.bb-zip--compact .bb-zip__where {
+  color: #fff;
+}
+
+.bb-zip--compact .bb-zip__soon-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.bb-zip--compact .bb-btn--outline {
+  background: transparent;
+  border-color: #fff;
+  color: #fff;
+}
+
+.bb-zip__book {
+  margin-top: 0.7rem;
+}
+
+.bb-zip__unserved-help {
+  font-weight: 500;
+  margin-top: 0.25rem !important;
+}
+
+.bb-zip__soon-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Pickup flow steps on /book-pickup */
+.bb-flow-steps {
+  counter-reset: flow;
+  display: flex;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.bb-flow-steps li {
+  background: var(--bb-purple-tint);
+  border-radius: 999px;
+  color: var(--bb-purple);
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.4rem 0.35rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bb-flow-steps li[aria-current='step'] {
+  background: var(--bb-purple);
+  color: #fff;
 }
 
 /* Area price card on /book-pickup */

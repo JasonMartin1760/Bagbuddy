@@ -16,7 +16,7 @@ import {
   type ServiceZip,
 } from '~/data/serviceAreas';
 import {PRODUCT_PRICING, formatUsd, getPickupPricing} from '~/config/pricing';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 const PICKUP_VARIANTS_QUERY = `#graphql
   query PickupVariants(
@@ -95,6 +95,20 @@ export default function BookPickup() {
   const pickup = area && served ? getPickupPricing(area) : undefined;
   const pickupVariant = pickup ? variants[pickup.handle] : undefined;
 
+  // After a zip is confirmed, bring the "Continue" step into view (mobile).
+  const areaRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+  const pickupHandle = pickup?.handle;
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    if (pickupHandle) {
+      areaRef.current?.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+  }, [pickupHandle]);
+
   const zipForEmail = match?.zip ?? initialZip;
   const subject = encodeURIComponent('Pickup request');
   const body = encodeURIComponent(
@@ -107,8 +121,8 @@ export default function BookPickup() {
         <div className="bb-container">
           <h1>Schedule Bag Pickup</h1>
           <p className="bb-lead">
-            Filled your bag? Check your zip code to see your pickup price, then
-            book online or give us a call.
+            Filled your bag? Enter your zip code to see your pickup price, add
+            any extra items, then check out. Or give us a call.
           </p>
         </div>
       </section>
@@ -116,21 +130,33 @@ export default function BookPickup() {
       <section className="bb-section">
         <div className="bb-container bb-split">
           <div className="bb-card">
+            <ol className="bb-flow-steps" aria-label="Pickup steps">
+              <li aria-current={pickup ? undefined : 'step'}>1. Zip code</li>
+              <li aria-current={pickup ? 'step' : undefined}>2. Extra items</li>
+              <li>3. Checkout</li>
+            </ol>
             <ZipChecker
-              heading="Check cost and if we serve your area"
-              helpText="Enter your zip code to check if we serve your area and see your exact pickup price"
+              heading="Enter your zip code"
+              helpText="We'll show whether we serve your area and your exact pickup price."
               headingLevel="h2"
               initialZip={initialZip}
               onAreaChange={setMatch}
+              variant="flow"
             />
             {pickup ? (
-              <div className="bb-book__area">
-                <p className="bb-book__area-label">{pickup.label}</p>
-                {pickup.price !== null ? (
-                  <p className="bb-book__area-price">
-                    {formatUsd(pickup.price)} <small>{pickup.unit}</small>
-                  </p>
-                ) : null}
+              <div className="bb-book__area" ref={areaRef}>
+                {/* Price is already in the zip result; show it here only when
+                    the area came from a link without a zip. */}
+                {match ? null : (
+                  <>
+                    <p className="bb-book__area-label">{pickup.label}</p>
+                    {pickup.price !== null ? (
+                      <p className="bb-book__area-price">
+                        {formatUsd(pickup.price)} <small>{pickup.unit}</small>
+                      </p>
+                    ) : null}
+                  </>
+                )}
                 {pickupVariant?.availableForSale ? (
                   <FeesStepPurchase
                     key={pickup.handle}
@@ -138,10 +164,10 @@ export default function BookPickup() {
                     feeVariants={feeVariants}
                     mainAttributeKey="Add-on items reviewed"
                     goTo="checkout"
-                    startLabel="Schedule pickup"
+                    startLabel="Continue"
                     submitLabel="Continue to checkout"
                     intro={PICKUP_FEES_INTRO}
-                    note="Next: add any extra-cost items in your bag, then check out."
+                    note="Next: tell us about any extra-cost items in your bag, then check out."
                   />
                 ) : (
                   <Link

@@ -123,7 +123,7 @@ export function FeesStepPurchase({
         }}
       >
         <div className="bb-fees-step__inner">
-          <p className="bb-fees-step__eyebrow">Step 2 of 2</p>
+          <p className="bb-fees-step__eyebrow">Step 2 of 3</p>
           <h2 id={titleId} className="bb-fees-step__title">
             Extra item charges at pickup
           </h2>
