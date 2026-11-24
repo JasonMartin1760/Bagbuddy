@@ -2,19 +2,20 @@ import {useState} from 'react';
 import {Link} from 'react-router';
 import type {Route} from './+types/_index';
 import {ServiceMap} from '~/components/bagbuddy/ServiceMap';
-import {
-  ZipChecker,
-  bookPickupHref,
-  isServedZip,
-} from '~/components/bagbuddy/ZipChecker';
+import {ZipChecker, isServedZip} from '~/components/bagbuddy/ZipChecker';
+import type {ServiceZip} from '~/data/serviceAreas';
 import {
   AllowedLists,
   BulletList,
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
-import {BUY_BAG_PATH, SITE} from '~/config/site';
+import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
 import {TESTIMONIALS} from '~/config/testimonials';
-import {PRODUCT_PRICING, formatUsd} from '~/config/pricing';
+import {
+  LOWEST_PICKUP_PRICE,
+  PRODUCT_PRICING,
+  formatUsd,
+} from '~/config/pricing';
 import {
   ABOUT,
   ALLOWED,
@@ -23,7 +24,6 @@ import {
   PLACEMENT,
   WHY_BAG_DUMPSTER,
 } from '~/data/content';
-import type {ServiceZip} from '~/data/serviceAreas';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -37,20 +37,22 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export default function Homepage() {
+  // Main zip check lives in the pickup flow (/book-pickup, step 1); the
+  // compact checker under the map highlights the matched area here.
+  const bookHref = BOOK_PICKUP_PATH;
   const [match, setMatch] = useState<ServiceZip | null>(null);
   const matchedArea = isServedZip(match) ? match.area : null;
-  const bookHref = bookPickupHref(match);
   const bag = PRODUCT_PRICING['dumpster-bag'];
 
   const hero = SITE.heroImage;
 
   return (
     <div className="bb-home">
-      {/* Hero: zip checker, map and the two main buttons, visible right away. */}
+      {/* Hero: heading, starting price and the two main buttons, then the map. */}
       {/* TODO(Jason): swap the placeholder for the truck photo in app/config/site.ts. */}
       <section
         className={hero.src ? 'bb-hero bb-hero--photo' : 'bb-hero'}
-        aria-label="Check your zip code"
+        aria-labelledby="hero-title"
       >
         {hero.src ? (
           <picture className="bb-hero__bg">
@@ -68,19 +70,22 @@ export default function Homepage() {
           </picture>
         ) : null}
         <div className="bb-hero__inner">
-          <div className="bb-hero__checker">
-            <ZipChecker
-              heading="Check cost and if we serve your area"
-              helpText="Enter your zip code to check if we serve your area and see your exact pickup price"
-              onAreaChange={setMatch}
-            />
+          <div className="bb-hero__intro">
+            <h1 id="hero-title" className="bb-hero__title">
+              Fill a bag on your own time. We&rsquo;ll haul it away.
+            </h1>
+            {LOWEST_PICKUP_PRICE !== null ? (
+              <p className="bb-hero__price">
+                Pickup starting at {formatUsd(LOWEST_PICKUP_PRICE)}
+              </p>
+            ) : null}
           </div>
           <div className="bb-hero__ctas">
             <Link
               className="bb-btn bb-btn--yellow bb-btn--lg"
               to={BUY_BAG_PATH}
             >
-              Buy a Dumpster Bag Now
+              Buy a Dumpster Bag
             </Link>
             <Link
               className="bb-btn bb-btn--outline-light bb-btn--lg"
@@ -91,6 +96,12 @@ export default function Homepage() {
           </div>
           <div className="bb-hero__map">
             <ServiceMap highlightedArea={matchedArea} />
+            <ZipChecker
+              heading="Check if we serve your zip code"
+              headingLevel="h2"
+              variant="compact"
+              onAreaChange={setMatch}
+            />
           </div>
         </div>
       </section>

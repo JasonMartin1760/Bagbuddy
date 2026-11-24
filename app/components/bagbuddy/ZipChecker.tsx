@@ -12,7 +12,7 @@ import {
   PICKUP_STARTING_PRICE,
   formatUsd,
 } from '~/config/pricing';
-import {CallButton} from '~/components/bagbuddy/ContactButton';
+import {CallButton, TextButton} from '~/components/bagbuddy/ContactButton';
 
 type Result =
   | {status: 'idle'}
@@ -34,6 +34,7 @@ export function ZipChecker({
   onAreaChange,
   headingLevel = 'h1',
   initialZip = '',
+  variant = 'default',
 }: {
   heading: string;
   helpText?: string;
@@ -41,16 +42,24 @@ export function ZipChecker({
   onAreaChange?: (match: ServiceZip | null) => void;
   headingLevel?: 'h1' | 'h2';
   initialZip?: string;
+  /**
+   * - `flow`: step 1 of the pickup flow. Checks as soon as 5 digits are typed,
+   *   shows the exact area price and leaves the "continue" button to the page.
+   * - `compact`: small banner under the homepage map. Same results, with a
+   *   "Schedule Bag Pickup" button that carries the zip into the pickup flow.
+   */
+  variant?: 'default' | 'flow' | 'compact';
 }) {
+  const inFlow = variant === 'flow';
+  const compact = variant === 'compact';
   const inputId = useId();
   const helpId = useId();
   const [zip, setZip] = useState(initialZip);
   const [result, setResult] = useState<Result>(() => checkZip(initialZip));
   const Heading = headingLevel;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const next = checkZip(zip);
+  function runCheck(value: string) {
+    const next = checkZip(value);
     setResult(next.status === 'idle' ? {status: 'invalid'} : next);
     onAreaChange?.(
       next.status === 'served' || next.status === 'coming-soon'
@@ -59,10 +68,15 @@ export function ZipChecker({
     );
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    runCheck(zip);
+  }
+
   return (
-    <div className="bb-zip">
+    <div className={compact ? 'bb-zip bb-zip--compact' : 'bb-zip'}>
       <Heading className="bb-zip__heading">{heading}</Heading>
-      <PriceNote />
+      {variant === 'default' ? <PriceNote /> : null}
       <form className="bb-zip__form" onSubmit={handleSubmit} noValidate>
         <label htmlFor={inputId} className="visually-hidden">
           Zip code
@@ -75,16 +89,28 @@ export function ZipChecker({
           autoComplete="postal-code"
           pattern="[0-9]{5}"
           maxLength={5}
-          placeholder="Enter zip code"
+          placeholder="Zip code"
           aria-describedby={helpText ? helpId : undefined}
           aria-invalid={result.status === 'invalid'}
           value={zip}
-          onChange={(event) =>
-            setZip(event.target.value.replace(/\D/g, '').slice(0, 5))
-          }
+          onChange={(event) => {
+            const value = event.target.value.replace(/\D/g, '').slice(0, 5);
+            setZip(value);
+            if (inFlow && value.length === 5 && value !== zip) {
+              runCheck(value);
+              if (findServiceZip(value)) event.target.blur();
+            }
+          }}
         />
-        <button type="submit" className="bb-btn bb-btn--yellow bb-zip__submit">
-          Verify
+        <button
+          type="submit"
+          className={
+            compact
+              ? 'bb-btn bb-btn--outline-light bb-zip__submit'
+              : 'bb-btn bb-btn--yellow bb-zip__submit'
+          }
+        >
+          {compact ? 'Check' : 'Verify'}
         </button>
       </form>
       {helpText ? (
@@ -93,7 +119,7 @@ export function ZipChecker({
         </p>
       ) : null}
       <div className="bb-zip__result" role="status" aria-live="polite">
-        <ZipResult result={result} />
+        <ZipResult result={result} variant={variant} />
       </div>
     </div>
   );
@@ -138,7 +164,14 @@ function checkZip(raw: string): Result {
     : {status: 'coming-soon', match};
 }
 
-function ZipResult({result}: {result: Result}) {
+function ZipResult({
+  result,
+  variant,
+}: {
+  result: Result;
+  variant: 'default' | 'flow' | 'compact';
+}) {
+  const showContact = variant !== 'default';
   switch (result.status) {
     case 'idle':
       return null;
@@ -150,9 +183,20 @@ function ZipResult({result}: {result: Result}) {
       );
     case 'unserved':
       return (
-        <p className="bb-zip__msg bb-zip__msg--error">
-          We&rsquo;re sorry, we do not serve this area.
-        </p>
+        <div className="bb-zip__msg bb-zip__msg--error">
+          <p>We&rsquo;re sorry, we do not serve this area.</p>
+          {showContact ? (
+            <>
+              <p className="bb-zip__unserved-help">
+                Not sure? Call or text us and we&rsquo;ll check for you.
+              </p>
+              <div className="bb-zip__soon-cta">
+                <CallButton />
+                <TextButton />
+              </div>
+            </>
+          ) : null}
+        </div>
       );
     case 'coming-soon':
       return (
@@ -164,6 +208,7 @@ function ZipResult({result}: {result: Result}) {
           </p>
           <div className="bb-zip__soon-cta">
             <CallButton />
+            {showContact ? <TextButton /> : null}
           </div>
         </div>
       );
@@ -175,14 +220,29 @@ function ZipResult({result}: {result: Result}) {
         <div className="bb-zip__msg bb-zip__msg--success">
           <p className="bb-zip__served">✅ We serve your area!</p>
           <p className="bb-zip__price">
-            {price !== null
-              ? `Pickup starting at ${formatUsd(price)} in your area`
-              : 'Call or book for your pickup price'}
+            {price === null
+              ? 'Call or book for your pickup price'
+              : variant !== 'default'
+                ? `Your pickup price: ${formatUsd(price)}`
+                : `Pickup starting at ${formatUsd(price)} in your area`}
           </p>
           <p className="bb-zip__where">
-            {area.label} area · {match.zip} ·{' '}
-            <Link to={bookPickupHref(match)}>Schedule bag pickup</Link>
+            {area.label} area · {match.zip}
+            {variant === 'default' ? (
+              <>
+                {' · '}
+                <Link to={bookPickupHref(match)}>Schedule bag pickup</Link>
+              </>
+            ) : null}
           </p>
+          {variant === 'compact' ? (
+            <Link
+              className="bb-btn bb-btn--outline-light bb-zip__book"
+              to={bookPickupHref(match)}
+            >
+              Schedule Bag Pickup
+            </Link>
+          ) : null}
         </div>
       );
     }
