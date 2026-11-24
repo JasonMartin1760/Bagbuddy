@@ -19,25 +19,38 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
+/**
+ * Site-wide header (Jason's layout):
+ * - the full logo (with its baked-in tagline) gets its own row, as large as
+ *   the width allows
+ * - the phone number sits directly below the logo
+ * - menu and cart are stacked on the right
+ * - on desktop the nav links sit between the logo block and the stack
+ */
 export function Header({cart}: HeaderProps) {
   return (
     <header className="header bb-header">
-      <Link prefetch="intent" to="/" className="bb-header__logo">
-        <picture>
-          <source srcSet="/images/bagbuddy-logo-color.webp" type="image/webp" />
-          <img
-            src="/images/bagbuddy-logo-color.png"
-            alt={SITE.name}
-            width={640}
-            height={305}
-          />
-        </picture>
-      </Link>
-      <HeaderMenu viewport="desktop" />
-      <div className="bb-header__ctas">
+      <div className="bb-header__brand">
+        <Link prefetch="intent" to="/" className="bb-header__logo">
+          <picture>
+            <source
+              srcSet="/images/bagbuddy-logo-color.webp"
+              type="image/webp"
+            />
+            <img
+              src="/images/bagbuddy-logo-color.png"
+              alt={`${SITE.name}: ${SITE.tagline}`}
+              width={640}
+              height={305}
+            />
+          </picture>
+        </Link>
         <CallButton className="bb-header__call" />
-        <CartToggle cart={cart} />
+      </div>
+      <HeaderMenu viewport="desktop" />
+      <div className="bb-header__stack">
         <HeaderMenuMobileToggle />
+        <CartToggle cart={cart} />
       </div>
     </header>
   );
