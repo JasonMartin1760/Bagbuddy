@@ -11,9 +11,10 @@ import {
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
+import {pageTitle} from '~/config/site';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: pageTitle('Search')}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {

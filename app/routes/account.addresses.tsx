@@ -17,6 +17,7 @@ import {
   DELETE_ADDRESS_MUTATION,
   CREATE_ADDRESS_MUTATION,
 } from '~/graphql/customer-account/CustomerAddressMutations';
+import {pageTitle} from '~/config/site';
 
 export type ActionResponse = {
   addressId?: string | null;
@@ -28,7 +29,7 @@ export type ActionResponse = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Addresses'}];
+  return [{title: pageTitle('Addresses')}];
 };
 
 export async function loader({context}: Route.LoaderArgs) {

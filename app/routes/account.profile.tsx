@@ -9,6 +9,7 @@ import {
   useOutletContext,
 } from 'react-router';
 import type {Route} from './+types/account.profile';
+import {pageTitle} from '~/config/site';
 
 export type ActionResponse = {
   error: string | null;
@@ -16,7 +17,7 @@ export type ActionResponse = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Profile'}];
+  return [{title: pageTitle('Profile')}];
 };
 
 export async function loader({context}: Route.LoaderArgs) {

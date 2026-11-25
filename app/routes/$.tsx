@@ -1,3 +1,4 @@
+import {pageTitle} from '~/config/site';
 import type {Route} from './+types/$';
 
 export async function loader({request}: Route.LoaderArgs) {
@@ -9,3 +10,7 @@ export async function loader({request}: Route.LoaderArgs) {
 export default function CatchAllPage() {
   return null;
 }
+
+export const meta: Route.MetaFunction = () => {
+  return [{title: pageTitle('Page not found')}];
+};

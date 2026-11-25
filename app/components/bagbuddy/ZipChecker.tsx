@@ -224,13 +224,12 @@ export function isServedZip(match: ServiceZip | null): match is ServiceZip {
 }
 
 /**
- * Book Pickup link that carries a served zip and its area, so the booking
- * page shows that area's price and pickup checkout.
+ * Book Pickup link that carries a served zip, so the booking page shows
+ * that area's price and pickup checkout. Area is derived from the zip;
+ * `?area=` without a zip is still accepted for older links.
  */
 export function bookPickupHref(match: ServiceZip | null): string {
-  return isServedZip(match)
-    ? `/book-pickup?zip=${match.zip}&area=${match.area}`
-    : '/book-pickup';
+  return isServedZip(match) ? `/book-pickup?zip=${match.zip}` : '/book-pickup';
 }
 
 /**

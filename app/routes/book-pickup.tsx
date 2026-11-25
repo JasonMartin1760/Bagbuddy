@@ -6,7 +6,7 @@ import {BulletList} from '~/components/bagbuddy/InfoBlocks';
 import {PickupSteps} from '~/components/bagbuddy/PickupSteps';
 import {loadFeeVariants} from '~/lib/feeVariants';
 import {productDataCache} from '~/lib/cache';
-import {BUY_BAG_PATH, SITE, phoneHref} from '~/config/site';
+import {BUY_BAG_PATH, SITE, phoneHref, pageTitle} from '~/config/site';
 import {HOW_FULL, PLACEMENT} from '~/data/content';
 import {
   SERVICE_AREAS,
@@ -69,7 +69,7 @@ export async function loader({context}: Route.LoaderArgs) {
 
 export const meta: Route.MetaFunction = () => {
   return [
-    {title: `Book a Pickup | ${SITE.name}`},
+    {title: pageTitle('Book a Pickup')},
     {
       name: 'description',
       content:
