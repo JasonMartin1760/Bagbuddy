@@ -11,10 +11,10 @@ import {
   formatUsd,
   type ShopProductKind,
 } from '~/config/pricing';
-import {BOOK_PICKUP_PATH, SITE} from '~/config/site';
+import {BOOK_PICKUP_PATH, pageTitle} from '~/config/site';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Buy Bags | ${SITE.name}`}];
+  return [{title: pageTitle('Buy Bags')}];
 };
 
 export async function loader(args: Route.LoaderArgs) {

@@ -33,7 +33,7 @@ import {
   type ProductKind,
   type ProductPricing,
 } from '~/config/pricing';
-import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
+import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE, pageTitle} from '~/config/site';
 import {
   ALLOWED,
   PICKUP_FEES_INTRO,
@@ -47,7 +47,7 @@ export const meta: Route.MetaFunction = ({data}) => {
   const title = data?.product?.title ?? data?.planned?.title ?? 'Product';
   const handle = data?.product?.handle ?? data?.planned?.handle ?? '';
   return [
-    {title: `${title} | ${SITE.name}`},
+    {title: pageTitle(title)},
     {
       rel: 'canonical',
       href: `/products/${handle}`,

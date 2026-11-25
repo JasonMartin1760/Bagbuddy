@@ -12,6 +12,10 @@ import {
 } from 'react-router';
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
+import favicon16 from '~/assets/favicon-16.png';
+import favicon32 from '~/assets/favicon-32.png';
+import appleTouchIcon from '~/assets/apple-touch-icon.png';
+import {pageTitle} from '~/config/site';
 import {HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -64,8 +68,25 @@ export function links() {
       href: 'https://shop.app',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon32},
+    {rel: 'icon', type: 'image/png', sizes: '16x16', href: favicon16},
+    {rel: 'apple-touch-icon', sizes: '180x180', href: appleTouchIcon},
   ];
 }
+
+/**
+ * Fallback tab title when a route does not export its own. Child route
+ * titles replace this; we skip it when a match already set one so the
+ * document does not end up with two <title> tags.
+ */
+export const meta: Route.MetaFunction = ({matches}) => {
+  const hasChildTitle = matches.some(
+    (match, index) =>
+      index > 0 &&
+      match?.meta?.some((tag) => 'title' in tag && Boolean(tag.title)),
+  );
+  return hasChildTitle ? [] : [{title: pageTitle()}];
+};
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -217,6 +238,14 @@ export function ErrorBoundary() {
   } else if (error instanceof Error) {
     errorMessage = error.message;
   }
+
+  const tabTitle =
+    errorStatus === 404
+      ? pageTitle('Page not found')
+      : pageTitle('Something went wrong');
+  useEffect(() => {
+    document.title = tabTitle;
+  }, [tabTitle]);
 
   return (
     <div className="route-error">

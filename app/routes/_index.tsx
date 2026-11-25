@@ -10,7 +10,7 @@ import {
   BulletList,
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
-import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE} from '~/config/site';
+import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE, pageTitle} from '~/config/site';
 import {TESTIMONIALS} from '~/config/testimonials';
 import {
   LOWEST_PICKUP_PRICE,
@@ -28,7 +28,7 @@ import {
 
 export const meta: Route.MetaFunction = () => {
   return [
-    {title: `${SITE.name} | Dumpster bags and pickup in Colorado`},
+    {title: pageTitle('Dumpster Bag Pickup in Colorado Springs')},
     {
       name: 'description',
       content:

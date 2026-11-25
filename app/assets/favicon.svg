@@ -1,28 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none">
-  <style>
-    .stroke {
-      stroke: #000;
-    }
-    .fill {
-      fill: #000;
-    }
-    @media (prefers-color-scheme: dark) {
-      .stroke {
-        stroke: #fff;
-      }
-      .fill {
-        fill: #fff;
-      }
-    }
-  </style>
-  <path
-    class="stroke"
-    fill-rule="evenodd"
-    d="M16.1 16.04 1 8.02 6.16 5.3l5.82 3.09 4.88-2.57-5.82-3.1L16.21 0l15.1 8.02-5.17 2.72-5.5-2.91-4.88 2.57 5.5 2.92-5.16 2.72Z"
-  />
-  <path
-    class="fill"
-    fill-rule="evenodd"
-    d="M16.1 32 1 23.98l5.16-2.72 5.82 3.08 4.88-2.57-5.82-3.08 5.17-2.73 15.1 8.02-5.17 2.72-5.5-2.92-4.88 2.58 5.5 2.92L16.1 32Z"
-  />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7.04" fill="#472F92"/>
+  <path fill="none" stroke="#F5EB27" stroke-width="2.208" stroke-linejoin="round" stroke-linecap="round" d="M8.070 15.586 L16.103 7.087 L23.929 15.586 Z"/>
+  <rect x="3.840" y="15.110" width="24.320" height="7.915" rx="2.120" fill="#F5EB27"/>
 </svg>

@@ -128,3 +128,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
   {label: 'About', to: '/#about'},
   {label: 'Contact', to: '/#contact'},
 ];
+
+/** Browser-tab title. Always leads with the brand, never the Shopify shop name. */
+export function pageTitle(page?: string): string {
+  return page ? `${SITE.name} | ${page}` : SITE.name;
+}

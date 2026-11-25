@@ -1,6 +1,11 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/policies._index';
 import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
+import {pageTitle} from '~/config/site';
+
+export const meta: Route.MetaFunction = () => {
+  return [{title: pageTitle('Policies')}];
+};
 
 export async function loader({context}: Route.LoaderArgs) {
   const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);

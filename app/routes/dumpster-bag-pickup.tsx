@@ -7,7 +7,7 @@ import {
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
 import {ContactSheet} from '~/components/ContactSheet';
-import {SITE} from '~/config/site';
+import {SITE, pageTitle} from '~/config/site';
 import {
   PRODUCT_PRICING,
   formatUsd,
@@ -66,7 +66,7 @@ export async function loader({context, request}: Route.LoaderArgs) {
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
-    {title: `Dumpster Bag Pickup Service | ${SITE.name}`},
+    {title: pageTitle('Dumpster Bag Pickup Service')},
     {
       name: 'description',
       content:
