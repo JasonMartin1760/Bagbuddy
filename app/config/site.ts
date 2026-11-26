@@ -20,6 +20,17 @@ export const SITE = {
   /** Pickup-time promise, used wherever pickup timing is mentioned. */
   pickupPromise: 'We pick up most bags within three business days.',
 
+  /**
+   * Size of the Bag Buddy dumpster bag sold on the site.
+   * Use these strings everywhere the dimensions or capacity appear.
+   */
+  bagSize: {
+    dims: '4×8 ft',
+    capacity: '3 cubic yards',
+    /** Short form for pickup pricing lines, e.g. "3-yard bag pickup". */
+    shortLabel: '3-yard',
+  },
+
   /** Business phone, shown on every click-to-call button. */
   phone: '(719) 419-2257' as string | null,
 
@@ -60,7 +71,7 @@ export const SITE = {
     avifSrc: '/images/bag-yellow-dumpster-bag.avif' as string | null,
     src: '/images/bag-yellow-dumpster-bag.webp',
     fallbackSrc: '/images/bag-yellow-dumpster-bag.jpg',
-    alt: 'Bag Buddy yellow dumpster bag',
+    alt: 'Bag Buddy yellow 4×8 ft dumpster bag that holds 3 cubic yards',
     width: 1000,
     height: 1000,
   },
@@ -90,6 +101,16 @@ export const SITE = {
     height: 1200,
   },
 } as const;
+
+/** Product-page spec line: "4×8 ft bag · holds 3 cubic yards". */
+export function bagSizeSpecLine(): string {
+  return `${SITE.bagSize.dims} bag · holds ${SITE.bagSize.capacity}`;
+}
+
+/** Pickup pricing line: "3-yard bag pickup, starting at $130". */
+export function bagPickupStartingAt(formattedPrice: string): string {
+  return `${SITE.bagSize.shortLabel} bag pickup, starting at ${formattedPrice}`;
+}
 
 /** Turns a display phone number into a tel: href. */
 export function phoneHref(phone: string): string {
