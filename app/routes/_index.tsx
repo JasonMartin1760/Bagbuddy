@@ -10,7 +10,13 @@ import {
   BulletList,
   FeeList,
 } from '~/components/bagbuddy/InfoBlocks';
-import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE, pageTitle} from '~/config/site';
+import {
+  BOOK_PICKUP_PATH,
+  BUY_BAG_PATH,
+  SITE,
+  bagPickupStartingAt,
+  pageTitle,
+} from '~/config/site';
 import {TESTIMONIALS} from '~/config/testimonials';
 import {
   LOWEST_PICKUP_PRICE,
@@ -31,8 +37,7 @@ export const meta: Route.MetaFunction = () => {
     {title: pageTitle('Dumpster Bag Pickup in Colorado Springs')},
     {
       name: 'description',
-      content:
-        'Buy a dumpster bag, fill it on your own time and book a pickup. Serving Colorado Springs (El Paso County) and Woodland Park (Teller County).',
+      content: `Buy a ${SITE.bagSize.dims} dumpster bag that holds ${SITE.bagSize.capacity}, fill it on your own time and book a pickup. Serving Colorado Springs (El Paso County) and Woodland Park (Teller County).`,
     },
   ];
 };
@@ -83,7 +88,7 @@ export default function Homepage() {
             </h1>
             {LOWEST_PICKUP_PRICE !== null ? (
               <p className="bb-hero__price">
-                Pickup starting at {formatUsd(LOWEST_PICKUP_PRICE)}
+                {bagPickupStartingAt(formatUsd(LOWEST_PICKUP_PRICE))}
               </p>
             ) : null}
           </div>

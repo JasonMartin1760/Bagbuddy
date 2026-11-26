@@ -33,7 +33,13 @@ import {
   type ProductKind,
   type ProductPricing,
 } from '~/config/pricing';
-import {BOOK_PICKUP_PATH, BUY_BAG_PATH, SITE, pageTitle} from '~/config/site';
+import {
+  BOOK_PICKUP_PATH,
+  BUY_BAG_PATH,
+  SITE,
+  bagSizeSpecLine,
+  pageTitle,
+} from '~/config/site';
 import {
   ALLOWED,
   PICKUP_FEES_INTRO,
@@ -46,12 +52,22 @@ import {
 export const meta: Route.MetaFunction = ({data}) => {
   const title = data?.product?.title ?? data?.planned?.title ?? 'Product';
   const handle = data?.product?.handle ?? data?.planned?.handle ?? '';
+  const isBag =
+    handle === 'dumpster-bag' || data?.planned?.kind === 'dumpster-bag';
   return [
     {title: pageTitle(title)},
     {
       rel: 'canonical',
       href: `/products/${handle}`,
     },
+    ...(isBag
+      ? [
+          {
+            name: 'description',
+            content: `Buy a ${SITE.bagSize.dims} dumpster bag that holds ${SITE.bagSize.capacity}. Fill it on your own time, then book a pickup. Shipped to your door.`,
+          },
+        ]
+      : []),
   ];
 };
 
@@ -174,6 +190,9 @@ function ShopifyProduct({
         </div>
         <div className="bb-pdp__main">
           <h1>{title}</h1>
+          {pricing?.kind === 'dumpster-bag' ? (
+            <p className="bb-pdp__spec">{bagSizeSpecLine()}</p>
+          ) : null}
           <div className="bb-pdp__price">
             {pricing && pricing.price !== null ? (
               <p>
@@ -253,6 +272,9 @@ function PlannedProduct({pricing}: {pricing: ProductPricing}) {
         </div>
         <div className="bb-pdp__main">
           <h1>{pricing.title}</h1>
+          {pricing.kind === 'dumpster-bag' ? (
+            <p className="bb-pdp__spec">{bagSizeSpecLine()}</p>
+          ) : null}
           {pricing.price !== null ? (
             <div className="bb-pdp__price">
               <p>

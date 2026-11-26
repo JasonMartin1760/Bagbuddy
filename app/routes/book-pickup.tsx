@@ -72,8 +72,7 @@ export const meta: Route.MetaFunction = () => {
     {title: pageTitle('Book a Pickup')},
     {
       name: 'description',
-      content:
-        'Check your zip code and book a dumpster bag pickup in Colorado Springs (El Paso County) or Woodland Park (Teller County).',
+      content: `Check your zip code and book a ${SITE.bagSize.shortLabel} dumpster bag pickup in Colorado Springs (El Paso County) or Woodland Park (Teller County).`,
     },
   ];
 };

@@ -20,7 +20,7 @@ import {
   formatUsd,
 } from '~/config/pricing';
 import {CallButton, TextButton} from '~/components/bagbuddy/ContactButton';
-import {SITE, phoneHref} from '~/config/site';
+import {SITE, bagPickupStartingAt, phoneHref} from '~/config/site';
 
 type Result =
   | {status: 'idle'}
@@ -206,14 +206,14 @@ export function ZipChecker({
 }
 
 /**
- * Starting pickup price under the heading: "starting at" the lowest area
- * price (Colorado Springs $130; Woodland Park is $150).
+ * Starting pickup price under the heading: "3-yard bag pickup, starting at"
+ * the lowest area price (Colorado Springs $130; Woodland Park is $150).
  */
 function PriceNote() {
   if (LOWEST_PICKUP_PRICE === null) return null;
   return (
     <p className="bb-zip__prices">
-      Pickup starting at {formatUsd(LOWEST_PICKUP_PRICE)}
+      {bagPickupStartingAt(formatUsd(LOWEST_PICKUP_PRICE))}
     </p>
   );
 }
@@ -365,7 +365,7 @@ function ZipResult({
               ? 'Call or book for your pickup price'
               : variant !== 'default'
                 ? `Your pickup price: ${formatUsd(price)}`
-                : `Pickup starting at ${formatUsd(price)} in your area`}
+                : `${bagPickupStartingAt(formatUsd(price))} in your area`}
           </p>
           <p className="bb-zip__where">
             {area.label} area · {match.zip}
